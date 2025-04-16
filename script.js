@@ -129,7 +129,7 @@ window.addEventListener('DOMContentLoaded', function() {
           // 상태 메시지 업데이트
           statusDiv.textContent = `폰트 로드 완료: ${loadedCount}개`;
           
-          // 8초 후 상태 메시지 숨기기
+          // 3초 후 상태 메시지 숨기기
           setTimeout(() => {
             statusDiv.style.display = 'none';
           }, 1800);
@@ -171,10 +171,15 @@ imageLoader.addEventListener('change', function (e) {
       const originalWidth = img.width;
       const originalHeight = img.height;
       
+      // 모바일 여부 감지
+      const isMobile = window.innerWidth <= 768;
+      
       // 캔버스 컨테이너 크기 가져오기
       const canvasWrapper = document.querySelector('.canvas-wrapper');
-      const maxWidth = canvasWrapper.clientWidth;
-      const maxHeight = window.innerHeight * 0.7; // 화면 높이의 70% 정도로 제한
+      // 모바일에서는 화면 너비의 95%를 사용, 데스크탑에서는 컨테이너 너비 사용
+      const maxWidth = isMobile ? window.innerWidth * 0.95 : canvasWrapper.clientWidth;
+      // 모바일에서는 화면 높이의 80%를 사용, 데스크탑에서는 70% 사용
+      const maxHeight = window.innerHeight * (isMobile ? 0.8 : 0.7);
       
       // 디바이스 픽셀 비율 고려
       const dpr = window.devicePixelRatio || 1;
@@ -192,6 +197,13 @@ imageLoader.addEventListener('change', function (e) {
         // 이미지가 더 세로로 긴 경우
         displayHeight = maxHeight;
         displayWidth = displayHeight * aspectRatio;
+      }
+      
+      // 최소 여백 확보 (특히 모바일에서 중요)
+      if (isMobile) {
+        // 모바일에서는 약간의 여백을 줄임
+        displayWidth = Math.min(displayWidth, maxWidth);
+        displayHeight = Math.min(displayHeight, maxHeight);
       }
       
       // CSS 스타일 설정 (표시 크기)
@@ -540,8 +552,10 @@ function renderCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   if (img.src) {
-    // 이미지를 캔버스 크기에 맞게 그리기
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    // 이미지를 캔버스 크기에 맞게 그리기 (모바일에서도 꽉 차게)
+    const canvasDisplayWidth = canvas.width / window.canvasScale;
+    const canvasDisplayHeight = canvas.height / window.canvasScale;
+    ctx.drawImage(img, 0, 0, canvasDisplayWidth, canvasDisplayHeight);
   }
   
   // 텍스트 그리기 (이하 동일)
