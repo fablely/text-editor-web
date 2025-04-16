@@ -213,3 +213,40 @@ body {
   .hidden {
     display: none;
   }
+  
+  /* 페이블리 푸터 스타일 */
+  .fablely-footer {
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
+    background-color: #f2f2f7;
+    margin-top: 30px;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .footer-link {
+    color: #59b4ad;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 16px;
+    transition: color 0.2s;
+  }
+  
+  .footer-link:hover {
+    color: #3a7a75;
+    text-decoration: underline;
+  }
+  
+  .copyright {
+    font-size: 14px;
+    color: #8e8e93;
+    margin: 5px 0 0 0;
+  }
