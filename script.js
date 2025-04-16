@@ -15,6 +15,18 @@ const deleteTextBtn = document.getElementById('deleteTextBtn');
 const saveImageBtn = document.getElementById('saveImageBtn');
 const centerTextBtn = document.getElementById('centerTextBtn'); // 중앙 정렬 버튼 요소 추가
 
+// 모달 컨트롤 요소
+const textControlModal = document.getElementById('textControlModal');
+const modalFontFamily = document.getElementById('modalFontFamily');
+const modalFontSize = document.getElementById('modalFontSize');
+const modalFontColor = document.getElementById('modalFontColor');
+const modalOpacity = document.getElementById('modalOpacity');         // 추가: 불투명도
+const modalLetterSpacing = document.getElementById('modalLetterSpacing'); // 추가: 자간
+const modalRotation = document.getElementById('modalRotation');       // 추가: 회전
+const modalCenterBtn = document.getElementById('modalCenterBtn');
+const modalDeleteBtn = document.getElementById('modalDeleteBtn');
+const modalCloseBtn = document.getElementById('modalCloseBtn');
+
 let img = new Image();
 let textObjects = [];
 let selectedText = null;
@@ -77,6 +89,13 @@ window.addEventListener('DOMContentLoaded', function() {
         option.style.fontFamily = fontName;
         
         fontFamily.appendChild(option);
+        
+        // 모달 폰트 선택 옵션 추가
+        const modalOption = document.createElement('option');
+        modalOption.value = fontName;
+        modalOption.textContent = fontName;
+        modalOption.style.fontFamily = fontName;
+        modalFontFamily.appendChild(modalOption);
         
         loadedCount++;
         statusDiv.textContent = `폰트 로드: ${loadedCount}개 성공, ${failedCount}개 실패`;
@@ -322,7 +341,7 @@ function getEventPos(e) {
   }
 }
 
-// handleStart 함수 수정 - 빈 영역 클릭 시에만 선택 해제
+// handleStart 함수 수정 - 텍스트 선택 시 모달 표시
 function handleStart(e) {
   const { x, y } = getEventPos(e);
   const hit = findTextAtPosition(x, y);
@@ -333,20 +352,79 @@ function handleStart(e) {
     dragOffset.x = x - selectedText.x;
     dragOffset.y = y - selectedText.y;
     updateControlsFromText(selectedText);
+    
+    // 모달 컨트롤 업데이트 및 표시
+    updateModalControls(selectedText);
+    positionModalNearText(selectedText);
+    textControlModal.classList.remove('hidden');
+    
     renderCanvas(); // 선택 상태 시각적 표시를 위해 렌더링
     e.preventDefault();
   } else {
-    // 빈 영역 클릭 시 선택 해제
+    // 빈 영역 클릭 시 선택 해제 및 모달 숨김
     selectedText = null;
+    textControlModal.classList.add('hidden');
     renderCanvas();
   }
 }
 
+// 선택된 텍스트에 따라 모달 위치 조정
+function positionModalNearText(textObj) {
+  const canvasRect = canvas.getBoundingClientRect();
+  const modalWidth = 280; // 모달 너비
+  
+  // 텍스트 위치를 화면 좌표로 변환
+  const textScreenX = canvasRect.left + textObj.x;
+  const textScreenY = canvasRect.top + textObj.y;
+  
+  // 텍스트 크기 계산
+  ctx.font = `${textObj.size}px ${textObj.font}`;
+  let textWidth, textHeight;
+  
+  if (textObj.direction === 'vertical') {
+    textWidth = textObj.size;
+    textHeight = textObj.text.length * textObj.size;
+  } else {
+    textWidth = ctx.measureText(textObj.text).width;
+    textHeight = textObj.size;
+  }
+  
+  // 모달 위치 계산 (텍스트 중앙 아래)
+  let modalX = textScreenX + textWidth/2 - modalWidth/2;
+  let modalY = textScreenY + textHeight + 20; // 텍스트 아래 20px 간격
+  
+  // 화면 경계 확인
+  if (modalX < 10) modalX = 10;
+  if (modalX + modalWidth > window.innerWidth - 10)
+    modalX = window.innerWidth - modalWidth - 10;
+  
+  // 위치 적용
+  textControlModal.style.left = `${modalX}px`;
+  textControlModal.style.top = `${modalY}px`;
+}
+
+// 모달 컨트롤 값 업데이트
+function updateModalControls(textObj) {
+  modalFontFamily.value = textObj.font;
+  modalFontSize.value = textObj.size;
+  modalFontColor.value = textObj.color;
+  modalOpacity.value = textObj.opacity;               // 추가: 불투명도
+  modalLetterSpacing.value = textObj.letterSpacing || 0;  // 추가: 자간
+  modalRotation.value = textObj.rotation;             // 추가: 회전
+}
+
+// 텍스트 이동 시 모달도 함께 이동
 function handleMove(e) {
   if (!selectedText || !isDragging) return; // 드래그 중일 때만 이동
   const { x, y } = getEventPos(e);
   selectedText.x = x - dragOffset.x;
   selectedText.y = y - dragOffset.y;
+  
+  // 텍스트 이동 시 모달 위치도 업데이트
+  if (!textControlModal.classList.contains('hidden')) {
+    positionModalNearText(selectedText);
+  }
+  
   renderCanvas();
   e.preventDefault();
 }
@@ -472,6 +550,102 @@ function renderCanvas() {
     ctx.restore();
   }
 }
+
+// 모달 컨트롤 이벤트 리스너
+modalFontFamily.addEventListener('change', () => {
+  if (!selectedText) return;
+  selectedText.font = modalFontFamily.value;
+  fontFamily.value = modalFontFamily.value;
+  renderCanvas();
+});
+
+modalFontSize.addEventListener('input', () => {
+  if (!selectedText) return;
+  selectedText.size = parseInt(modalFontSize.value, 10);
+  fontSize.value = modalFontSize.value;
+  renderCanvas();
+  positionModalNearText(selectedText); // 크기 변경 시 모달 위치 조정
+});
+
+modalFontColor.addEventListener('input', () => {
+  if (!selectedText) return;
+  selectedText.color = modalFontColor.value;
+  fontColor.value = modalFontColor.value;
+  renderCanvas();
+});
+
+// 추가: 불투명도 이벤트 리스너
+modalOpacity.addEventListener('input', () => {
+  if (!selectedText) return;
+  selectedText.opacity = parseFloat(modalOpacity.value);
+  opacity.value = modalOpacity.value;
+  renderCanvas();
+});
+
+// 추가: 자간 이벤트 리스너
+modalLetterSpacing.addEventListener('input', () => {
+  if (!selectedText) return;
+  selectedText.letterSpacing = parseFloat(modalLetterSpacing.value);
+  letterSpacing.value = modalLetterSpacing.value;
+  renderCanvas();
+});
+
+// 추가: 회전 이벤트 리스너
+modalRotation.addEventListener('input', () => {
+  if (!selectedText) return;
+  selectedText.rotation = parseFloat(modalRotation.value);
+  rotation.value = modalRotation.value;
+  renderCanvas();
+  positionModalNearText(selectedText); // 회전 변경 시 모달 위치 조정
+});
+
+modalCenterBtn.addEventListener('click', () => {
+  if (!selectedText) return;
+  
+  // 기존 중앙 정렬 코드와 동일
+  const canvasCenterX = canvas.width / 2;
+  ctx.font = `${selectedText.size}px ${selectedText.font}`;
+  
+  let textWidth;
+  
+  if (selectedText.direction === 'vertical') {
+    textWidth = selectedText.size;
+  } else {
+    if (selectedText.letterSpacing !== 0) {
+      textWidth = 0;
+      for (let i = 0; i < selectedText.text.length; i++) {
+        textWidth += ctx.measureText(selectedText.text[i]).width;
+      }
+      textWidth += (selectedText.text.length - 1) * selectedText.letterSpacing;
+    } else {
+      textWidth = ctx.measureText(selectedText.text).width;
+    }
+  }
+  
+  selectedText.x = canvasCenterX - textWidth / 2;
+  
+  renderCanvas();
+  positionModalNearText(selectedText); // 위치 변경 후 모달 위치 조정
+});
+
+modalDeleteBtn.addEventListener('click', () => {
+  if (!selectedText) return;
+  textObjects = textObjects.filter(t => t !== selectedText);
+  selectedText = null;
+  textControlModal.classList.add('hidden');
+  renderCanvas();
+});
+
+modalCloseBtn.addEventListener('click', () => {
+  textControlModal.classList.add('hidden');
+});
+
+// 캔버스 외부 클릭 시 모달 닫기
+document.addEventListener('mousedown', (e) => {
+  if (!textControlModal.contains(e.target) && e.target !== canvas) {
+    textControlModal.classList.add('hidden');
+  }
+});
 
 // 이미지 저장 버튼 이벤트 핸들러 수정
 saveImageBtn.addEventListener('click', () => {
