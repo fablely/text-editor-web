@@ -676,7 +676,7 @@ modalCenterBtn.addEventListener('click', () => {
   if (!selectedText) return;
   
   // 기존 중앙 정렬 코드와 동일
-  const canvasCenterX = canvas.width / 2;
+  const canvasCenterX = (canvas.width / window.canvasScale) / 2;
   ctx.font = `${selectedText.size}px ${selectedText.font}`;
   
   let textWidth;
