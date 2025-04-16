@@ -364,15 +364,17 @@ centerTextBtn.addEventListener('click', () => {
 
 function getEventPos(e) {
   const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+
   if (e.touches && e.touches.length > 0) {
     return {
-      x: e.touches[0].clientX - rect.left,
-      y: e.touches[0].clientY - rect.top
+      x: (e.touches[0].clientX - rect.left) * dpr,
+      y: (e.touches[0].clientY - rect.top) * dpr
     };
   } else {
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      x: (e.clientX - rect.left) * dpr,
+      y: (e.clientY - rect.top) * dpr
     };
   }
 }
@@ -794,4 +796,3 @@ saveImageBtn.addEventListener('click', () => {
     link.click();
   }
 });
-
