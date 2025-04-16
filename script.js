@@ -25,6 +25,7 @@ let originalFileExt = "jpg"; // 원본 파일 확장자, 기본값 jpg
 
 // Fonts 폴더 내의 폰트 파일 목록 정의 (확장자 포함)
 const fontFiles = [
+  '강원교육모두.ttf',
   '강원교육현옥샘.ttf',
   '학교안심우산.ttf',
   '학교안심우주.ttf',
