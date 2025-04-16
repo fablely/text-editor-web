@@ -539,32 +539,32 @@ saveImageBtn.addEventListener('click', () => {
                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   
   if (isIOS) {
-    // iOS에서 공유 API를 지원하는지 확인
-    if (navigator.share) {
-      // 캔버스를 Blob으로 변환
-      tempCanvas.toBlob(async (blob) => {
-        try {
-          // 파일 객체 생성
-          const file = new File([blob], `${originalFileName}-edited.${fileExtension}`, { 
-            type: mimeType 
-          });
-          
-          // 공유 API 사용
-          await navigator.share({
-            title: '편집된 이미지',
-            files: [file]
-          });
-          
-          console.log('공유 성공');
-        } catch (error) {
-          console.error('공유 실패:', error);
-          // 공유 실패 시 기존 방식으로 폴백
-          showIOSDownloadPage(dataUrl);
-        }
-      }, mimeType, quality);
+    // iOS 디바이스에서는 새 창에 이미지 표시
+    const downloadWindow = window.open('');
+    if (downloadWindow) {
+      // 다운로드 안내 메시지와 함께 이미지 표시
+      downloadWindow.document.write(`
+        <html>
+          <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>이미지 저장</title>
+            <style>
+              body { font-family: -apple-system, sans-serif; text-align: center; padding: 20px; }
+              img { max-width: 100%; height: auto; margin: 15px auto; display: block; }
+              .instruction { color: #333; background: #f8f8f8; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+            </style>
+          </head>
+          <body>
+            <div class="instruction">
+              <h3>이미지 저장 방법</h3>
+              <p>아래 이미지를 길게 터치한 후 "이미지 저장"을 선택하세요.</p>
+            </div>
+            <img src="${dataUrl}" alt="편집된 이미지">
+          </body>
+        </html>
+      `);
     } else {
-      // 공유 API가 지원되지 않는 경우 기존 방식 사용
-      showIOSDownloadPage(dataUrl);
+      alert('팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용하거나 다른 브라우저에서 시도해주세요.');
     }
   } else {
     // 다른 기기에서는 기존 방식 사용
@@ -573,104 +573,5 @@ saveImageBtn.addEventListener('click', () => {
     link.href = dataUrl;
     link.click();
   }
-});
-
-// iOS용 다운로드 페이지 표시 함수
-function showIOSDownloadPage(dataUrl) {
-  const downloadWindow = window.open('');
-  if (downloadWindow) {
-    // 다운로드 안내 메시지와 함께 이미지 표시
-    downloadWindow.document.write(`
-      <html>
-        <head>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>이미지 저장</title>
-          <style>
-            body { font-family: -apple-system, sans-serif; text-align: center; padding: 20px; }
-            img { max-width: 100%; height: auto; margin: 15px auto; display: block; }
-            .instruction { color: #333; background: #f8f8f8; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-            .step { margin-bottom: 10px; text-align: left; }
-            .highlight { color: #007aff; font-weight: bold; }
-            .btn { background: #007aff; color: white; border: none; padding: 10px 15px; 
-                  border-radius: 10px; font-size: 16px; margin: 10px 0; }
-          </style>
-        </head>
-        <body>
-          <div class="instruction">
-            <h3>이미지를 사진 앱에 저장하기</h3>
-            <div class="step">1. 아래 이미지를 <span class="highlight">길게 터치</span>하세요.</div>
-            <div class="step">2. 메뉴에서 <span class="highlight">"이미지 저장"</span> 또는 <span class="highlight">"Add to Photos"</span>를 선택하세요.</div>
-            <div class="step">* 선택지에 사진 앱이 없다면 "<span class="highlight">More...</span>"를 눌러 추가 옵션을 확인하세요.</div>
-          </div>
-          <img src="${dataUrl}" alt="편집된 이미지" id="downloadImage">
-        </body>
-      </html>
-    `);
-  } else {
-    alert('팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용하거나 다른 브라우저에서 시도해주세요.');
-  }
-}
-
-// iOS에서 텍스트 입력 시 확대 방지
-document.addEventListener('DOMContentLoaded', function() {
-  // 모든 폼 요소에 대해 확대 방지 적용
-  const formElements = document.querySelectorAll('input, select, textarea');
-  
-  formElements.forEach(el => {
-    // 포커스 시 확대 방지를 위한 처리
-    el.addEventListener('focus', function(e) {
-      // 300ms 지연 후 페이지 확대 복원 시도
-      setTimeout(function() {
-        // 뷰포트 메타 태그 강제 갱신
-        const viewport = document.querySelector('meta[name="viewport"]');
-        if (viewport) {
-          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-        }
-        
-        // iOS에서 텍스트 입력 중 확대 방지를 위한 추가 처리
-        document.body.style.webkitTextSizeAdjust = '100%';
-        document.body.style.textSizeAdjust = '100%';
-      }, 300);
-    });
-    
-    // 필요시 블러 이벤트에서도 처리
-    el.addEventListener('blur', function() {
-      document.body.style.webkitTextSizeAdjust = '';
-      document.body.style.textSizeAdjust = '';
-    });
-  });
-  
-  // 확대 제스처(pinch/zoom) 방지
-  document.addEventListener('gesturestart', function(e) {
-    e.preventDefault();
-    return false;
-  }, { passive: false });
-  
-  document.addEventListener('gesturechange', function(e) {
-    e.preventDefault();
-    return false;
-  }, { passive: false });
-  
-  document.addEventListener('gestureend', function(e) {
-    e.preventDefault();
-    return false;
-  }, { passive: false });
-  
-  // 더블탭 확대 방지
-  let lastTouchEnd = 0;
-  document.addEventListener('touchend', function(e) {
-    const now = Date.now();
-    if (now - lastTouchEnd < 300) {
-      e.preventDefault();
-    }
-    lastTouchEnd = now;
-  }, { passive: false });
-  
-  // iOS 13+ 에서 포커스 시 확대 방지를 위한 추가 처리
-  document.addEventListener('touchstart', function(e) {
-    if (e.touches.length > 1) {
-      e.preventDefault(); // 멀티터치 방지
-    }
-  }, { passive: false });
 });
 
