@@ -611,3 +611,33 @@ function showIOSDownloadPage(dataUrl) {
   }
 }
 
+// iOS에서 텍스트 입력 시 확대 방지
+document.addEventListener('DOMContentLoaded', function() {
+  // 모든 폼 요소에 대해 확대 방지 적용
+  const formElements = document.querySelectorAll('input, select, textarea');
+  
+  formElements.forEach(el => {
+    // 포커스 시 확대 방지를 위한 처리
+    el.addEventListener('focus', function(e) {
+      // 300ms 지연 후 페이지 확대 복원 시도
+      setTimeout(function() {
+        // 뷰포트 메타 태그 강제 갱신
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        }
+        
+        // iOS에서 텍스트 입력 중 확대 방지를 위한 추가 처리
+        document.body.style.webkitTextSizeAdjust = '100%';
+        document.body.style.textSizeAdjust = '100%';
+      }, 300);
+    });
+    
+    // 필요시 블러 이벤트에서도 처리
+    el.addEventListener('blur', function() {
+      document.body.style.webkitTextSizeAdjust = '';
+      document.body.style.textSizeAdjust = '';
+    });
+  });
+});
+

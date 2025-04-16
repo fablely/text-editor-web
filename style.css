@@ -164,3 +164,24 @@ body {
   input, select, textarea {
     font-size: 16px; /* 모든 입력 요소에 적용 */
   }
+
+  /* 입력 필드 확대 방지 추가 스타일 */
+  html {
+    -webkit-text-size-adjust: 100%; /* iOS 텍스트 크기 자동 조정 방지 */
+    text-size-adjust: 100%;
+  }
+  
+  /* 모든 폼 요소 기본 16px 이상 설정 */
+  input, select, textarea, button {
+    font-size: 16px !important; /* !important로 다른 스타일 덮어쓰기 */
+    touch-action: manipulation; /* 더블탭 확대 방지 */
+  }
+  
+  /* 텍스트 입력 확대 방지 보완 */
+  #textInput {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0;
+    transform: translateZ(0); /* 하드웨어 가속 활성화 */
+  }
