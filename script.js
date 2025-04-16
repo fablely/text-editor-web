@@ -25,7 +25,6 @@ let originalFileExt = "jpg"; // 원본 파일 확장자, 기본값 jpg
 
 // Fonts 폴더 내의 폰트 파일 목록 정의 (확장자 포함)
 const fontFiles = [
-  '강원교육모두.ttf',
   '강원교육현옥샘.ttf',
   '학교안심우산.ttf',
   '학교안심우주.ttf',
@@ -540,32 +539,32 @@ saveImageBtn.addEventListener('click', () => {
                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   
   if (isIOS) {
-    // iOS 디바이스에서는 새 창에 이미지 표시
-    const downloadWindow = window.open('');
-    if (downloadWindow) {
-      // 다운로드 안내 메시지와 함께 이미지 표시
-      downloadWindow.document.write(`
-        <html>
-          <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>이미지 저장</title>
-            <style>
-              body { font-family: -apple-system, sans-serif; text-align: center; padding: 20px; }
-              img { max-width: 100%; height: auto; margin: 15px auto; display: block; }
-              .instruction { color: #333; background: #f8f8f8; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-            </style>
-          </head>
-          <body>
-            <div class="instruction">
-              <h3>이미지 저장 방법</h3>
-              <p>아래 이미지를 길게 터치한 후 "이미지 저장"을 선택하세요.</p>
-            </div>
-            <img src="${dataUrl}" alt="편집된 이미지">
-          </body>
-        </html>
-      `);
+    // iOS에서 공유 API를 지원하는지 확인
+    if (navigator.share) {
+      // 캔버스를 Blob으로 변환
+      tempCanvas.toBlob(async (blob) => {
+        try {
+          // 파일 객체 생성
+          const file = new File([blob], `${originalFileName}-edited.${fileExtension}`, { 
+            type: mimeType 
+          });
+          
+          // 공유 API 사용
+          await navigator.share({
+            title: '편집된 이미지',
+            files: [file]
+          });
+          
+          console.log('공유 성공');
+        } catch (error) {
+          console.error('공유 실패:', error);
+          // 공유 실패 시 기존 방식으로 폴백
+          showIOSDownloadPage(dataUrl);
+        }
+      }, mimeType, quality);
     } else {
-      alert('팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용하거나 다른 브라우저에서 시도해주세요.');
+      // 공유 API가 지원되지 않는 경우 기존 방식 사용
+      showIOSDownloadPage(dataUrl);
     }
   } else {
     // 다른 기기에서는 기존 방식 사용
@@ -575,4 +574,40 @@ saveImageBtn.addEventListener('click', () => {
     link.click();
   }
 });
+
+// iOS용 다운로드 페이지 표시 함수
+function showIOSDownloadPage(dataUrl) {
+  const downloadWindow = window.open('');
+  if (downloadWindow) {
+    // 다운로드 안내 메시지와 함께 이미지 표시
+    downloadWindow.document.write(`
+      <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>이미지 저장</title>
+          <style>
+            body { font-family: -apple-system, sans-serif; text-align: center; padding: 20px; }
+            img { max-width: 100%; height: auto; margin: 15px auto; display: block; }
+            .instruction { color: #333; background: #f8f8f8; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+            .step { margin-bottom: 10px; text-align: left; }
+            .highlight { color: #007aff; font-weight: bold; }
+            .btn { background: #007aff; color: white; border: none; padding: 10px 15px; 
+                  border-radius: 10px; font-size: 16px; margin: 10px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="instruction">
+            <h3>이미지를 사진 앱에 저장하기</h3>
+            <div class="step">1. 아래 이미지를 <span class="highlight">길게 터치</span>하세요.</div>
+            <div class="step">2. 메뉴에서 <span class="highlight">"이미지 저장"</span> 또는 <span class="highlight">"Add to Photos"</span>를 선택하세요.</div>
+            <div class="step">* 선택지에 사진 앱이 없다면 "<span class="highlight">More...</span>"를 눌러 추가 옵션을 확인하세요.</div>
+          </div>
+          <img src="${dataUrl}" alt="편집된 이미지" id="downloadImage">
+        </body>
+      </html>
+    `);
+  } else {
+    alert('팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용하거나 다른 브라우저에서 시도해주세요.');
+  }
+}
 
