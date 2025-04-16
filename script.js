@@ -362,7 +362,7 @@ centerTextBtn.addEventListener('click', () => {
   if (!selectedText) return; // 선택된 텍스트가 없으면 무시
   
   // 캔버스 가로 중앙 좌표 계산
-  const canvasCenterX = canvas.width / 2;
+  const canvasCenterX = (canvas.width / window.canvasScale) / 2;
   
   // 텍스트 너비 계산
   ctx.font = `${selectedText.size}px ${selectedText.font}`;
