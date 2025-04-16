@@ -176,28 +176,43 @@ imageLoader.addEventListener('change', function (e) {
       const maxWidth = canvasWrapper.clientWidth;
       const maxHeight = window.innerHeight * 0.7; // 화면 높이의 70% 정도로 제한
       
+      // 디바이스 픽셀 비율 고려
+      const dpr = window.devicePixelRatio || 1;
+      
       // 이미지 비율 유지하며 캔버스 크기 조정
       const aspectRatio = originalWidth / originalHeight;
       
-      let canvasWidth, canvasHeight;
+      let displayWidth, displayHeight;
       
       if (originalWidth / originalHeight > maxWidth / maxHeight) {
         // 이미지가 더 가로로 넓은 경우
-        canvasWidth = maxWidth;
-        canvasHeight = canvasWidth / aspectRatio;
+        displayWidth = maxWidth;
+        displayHeight = displayWidth / aspectRatio;
       } else {
         // 이미지가 더 세로로 긴 경우
-        canvasHeight = maxHeight;
-        canvasWidth = canvasHeight * aspectRatio;
+        displayHeight = maxHeight;
+        displayWidth = displayHeight * aspectRatio;
       }
       
-      // 캔버스 크기 설정
-      canvas.width = canvasWidth;
-      canvas.height = canvasHeight;
+      // CSS 스타일 설정 (표시 크기)
+      canvas.style.width = `${displayWidth}px`;
+      canvas.style.height = `${displayHeight}px`;
       
-      // CSS 스타일 설정
-      canvas.style.width = '100%';
-      canvas.style.height = 'auto';
+      // 캔버스 버퍼 크기를 DPR에 맞게 조정 (고해상도 렌더링)
+      canvas.width = displayWidth * dpr;
+      canvas.height = displayHeight * dpr;
+      
+      // 컨텍스트 스케일 조정
+      ctx.scale(dpr, dpr);
+      
+      // 이미지 렌더링 품질 최대화
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      
+      // 렌더링 중간 변수로 현재 스케일 저장 (텍스트 위치 계산에 필요)
+      window.canvasWidth = displayWidth;
+      window.canvasHeight = displayHeight;
+      window.canvasScale = dpr;
       
       renderCanvas();
       
@@ -364,17 +379,15 @@ centerTextBtn.addEventListener('click', () => {
 
 function getEventPos(e) {
   const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-
   if (e.touches && e.touches.length > 0) {
     return {
-      x: (e.touches[0].clientX - rect.left) * dpr,
-      y: (e.touches[0].clientY - rect.top) * dpr
+      x: e.touches[0].clientX - rect.left,
+      y: e.touches[0].clientY - rect.top
     };
   } else {
     return {
-      x: (e.clientX - rect.left) * dpr,
-      y: (e.clientY - rect.top) * dpr
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
     };
   }
 }
@@ -796,3 +809,4 @@ saveImageBtn.addEventListener('click', () => {
     link.click();
   }
 });
+
