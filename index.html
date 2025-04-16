@@ -7,6 +7,15 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- 팝업 모달 -->
+  <div id="welcomePopup" class="popup-overlay">
+    <div class="popup-content">
+      <p>해당 페이지는<br>서버에 사진을 보관하지 않습니다.<br> 안심하고 사용하세요.<br>
+      아이폰의 경우 사진 저장시 사진앱이 아닌<br>파일앱에 저장됩니다.<br>파일앱에서 사진을 확인해주세요.</p>
+      <button id="confirmBtn" class="popup-button">확인</button>
+    </div>
+  </div>
+
   <div class="editor-container">
     <label class="upload-button full-width">
       이미지 선택
@@ -61,5 +70,21 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    // 팝업 관련 스크립트
+    document.addEventListener('DOMContentLoaded', function() {
+      const popup = document.getElementById('welcomePopup');
+      const confirmBtn = document.getElementById('confirmBtn');
+      
+      // 페이지 로드 시 에디터 컨테이너 숨기기
+      document.querySelector('.editor-container').style.display = 'none';
+      
+      // 확인 버튼 클릭 시 팝업 닫기
+      confirmBtn.addEventListener('click', function() {
+        popup.classList.add('hidden');
+        document.querySelector('.editor-container').style.display = 'block';
+      });
+    });
+  </script>
 </body>
 </html>

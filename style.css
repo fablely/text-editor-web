@@ -64,7 +64,7 @@ body {
   .upload-button {
     display: inline-block;
     padding: 10px 14px;
-    background-color: #007aff;
+    background-color: #59b4ad;
     color: white;
     font-size: 14px;
     border-radius: 12px;
@@ -86,7 +86,7 @@ body {
   
   /* 버튼 */
   button {
-    background-color: #007aff;
+    background-color: #59b4ad;
     color: #fff;
     font-weight: 500;
     font-size: 16px;
@@ -98,7 +98,7 @@ body {
   }
   
   button:hover {
-    background-color: #005fcc;
+    background-color: #59b4acc2;
   }
   
   .small-button {
@@ -163,4 +163,50 @@ body {
   /* 텍스트 입력 시 화면 확대 방지를 위한 추가 설정 */
   input, select, textarea {
     font-size: 16px; /* 모든 입력 요소에 적용 */
+  }
+
+  /* 팝업 모달 스타일 */
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 90%;
+    width: 400px;
+    text-align: center;
+  }
+  
+  .popup-content p {
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  
+  .popup-button {
+    background-color: #59b4ad;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .popup-button:hover {
+    background-color: #59b4acc2;
+  }
+  
+  .hidden {
+    display: none;
   }
