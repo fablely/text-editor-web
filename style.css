@@ -151,3 +151,16 @@ body {
     display: block;
     text-align: center;
   }
+
+  /* 입력 필드 확대 방지 */
+  input[type="text"] {
+    font-size: 16px; /* 최소 16px 이상으로 설정해야 iOS에서 자동 확대를 방지할 수 있음 */
+    -webkit-appearance: none; /* iOS 기본 스타일 제거 */
+    appearance: none;
+    transform: scale(1.0); /* 입력 필드의 변환 방지 */
+  }
+
+  /* 텍스트 입력 시 화면 확대 방지를 위한 추가 설정 */
+  input, select, textarea {
+    font-size: 16px; /* 모든 입력 요소에 적용 */
+  }
