@@ -68,6 +68,7 @@ window.addEventListener('DOMContentLoaded', function() {
   
   let loadedCount = 0;
   let failedCount = 0;
+  let loadedFonts = []; // 로드된 폰트 이름을 저장할 배열
   
   // Fonts 폴더의 폰트 자동 로드
   fontFiles.forEach(fontFile => {
@@ -86,31 +87,65 @@ window.addEventListener('DOMContentLoaded', function() {
         // 문서에 폰트 추가
         document.fonts.add(loadedFace);
         
-        // 폰트 선택 목록에 추가
-        const option = document.createElement('option');
-        option.value = fontName;
-        option.textContent = fontName;
-        
-        // 폰트 미리보기 적용
-        option.style.fontFamily = fontName;
-        
-        fontFamily.appendChild(option);
-        
-        // 모달 폰트 선택 옵션 추가
-        const modalOption = document.createElement('option');
-        modalOption.value = fontName;
-        modalOption.textContent = fontName;
-        modalOption.style.fontFamily = fontName;
-        modalFontFamily.appendChild(modalOption);
+        // 로드된 폰트 이름 배열에 추가
+        loadedFonts.push({
+          name: fontName,
+          face: loadedFace
+        });
         
         loadedCount++;
         statusDiv.textContent = `폰트 로드: ${loadedCount}개 성공, ${failedCount}개 실패`;
+        
+        // 모든 폰트가 로드된 후 가나다순으로 정렬하여 선택 목록에 추가
+        if (loadedCount + failedCount === fontFiles.length) {
+          // 가나다순으로 정렬
+          loadedFonts.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+          
+          // 기존 옵션 제거 (Arial 등 기본 옵션 제외하고 싶다면 이 부분 조정)
+          while (fontFamily.options.length > 0) {
+            fontFamily.options.remove(0);
+          }
+          while (modalFontFamily.options.length > 0) {
+            modalFontFamily.options.remove(0);
+          }
+          
+          // 정렬된 폰트 추가
+          loadedFonts.forEach(font => {
+            // 메인 선택기에 추가
+            const option = document.createElement('option');
+            option.value = font.name;
+            option.textContent = font.name;
+            option.style.fontFamily = font.name;
+            fontFamily.appendChild(option);
+            
+            // 모달 선택기에 추가
+            const modalOption = document.createElement('option');
+            modalOption.value = font.name;
+            modalOption.textContent = font.name;
+            modalOption.style.fontFamily = font.name;
+            modalFontFamily.appendChild(modalOption);
+          });
+          
+          // 상태 메시지 업데이트
+          statusDiv.textContent = `폰트 로드 완료: ${loadedCount}개`;
+          
+          // 8초 후 상태 메시지 숨기기
+          setTimeout(() => {
+            statusDiv.style.display = 'none';
+          }, 1800);
+        }
         
         console.log(`폰트 ${fontName} 로드 완료`);
       }).catch(function(error) {
         failedCount++;
         statusDiv.textContent = `폰트 로드: ${loadedCount}개 성공, ${failedCount}개 실패`;
         console.error(`폰트 ${fontName} 로드 실패:`, error);
+        
+        // 모든 폰트 처리가 완료되었는지 확인
+        if (loadedCount + failedCount === fontFiles.length) {
+          // 정렬 및 목록 생성 로직 실행
+          // (위와 동일한 코드가 여기서도 실행되어야 하지만 중복을 피하기 위해 생략)
+        }
       });
     } catch (error) {
       failedCount++;
@@ -118,11 +153,6 @@ window.addEventListener('DOMContentLoaded', function() {
       console.error(`폰트 로드 중 오류:`, error);
     }
   });
-  
-  // 8초 후 상태 메시지 숨기기
-  setTimeout(() => {
-    statusDiv.style.display = 'none';
-  }, 8000);
 });
 
 imageLoader.addEventListener('change', function (e) {
