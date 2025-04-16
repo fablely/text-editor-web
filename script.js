@@ -355,8 +355,15 @@ function handleStart(e) {
     
     // 모달 컨트롤 업데이트 및 표시
     updateModalControls(selectedText);
-    positionModalNearText(selectedText);
+    
+    // 이미 모달이 표시되어 있었는지 확인
+    const wasHidden = textControlModal.classList.contains('hidden');
     textControlModal.classList.remove('hidden');
+    
+    // 처음 선택했거나 새 텍스트를 선택한 경우에만 위치 조정
+    if (wasHidden) {
+      positionModalNearText(selectedText);
+    }
     
     renderCanvas(); // 선택 상태 시각적 표시를 위해 렌더링
     e.preventDefault();
@@ -420,7 +427,7 @@ function handleMove(e) {
   selectedText.x = x - dragOffset.x;
   selectedText.y = y - dragOffset.y;
   
-  // 텍스트 이동 시 모달 위치도 업데이트
+  // 텍스트 드래그 시에만 모달 위치도 업데이트
   if (!textControlModal.classList.contains('hidden')) {
     positionModalNearText(selectedText);
   }
@@ -557,6 +564,7 @@ modalFontFamily.addEventListener('change', () => {
   selectedText.font = modalFontFamily.value;
   fontFamily.value = modalFontFamily.value;
   renderCanvas();
+  // 모달 위치 조정 코드 제거
 });
 
 modalFontSize.addEventListener('input', () => {
@@ -564,7 +572,7 @@ modalFontSize.addEventListener('input', () => {
   selectedText.size = parseInt(modalFontSize.value, 10);
   fontSize.value = modalFontSize.value;
   renderCanvas();
-  positionModalNearText(selectedText); // 크기 변경 시 모달 위치 조정
+  // 모달 위치 조정 코드 제거 - 더 이상 위치 업데이트하지 않음
 });
 
 modalFontColor.addEventListener('input', () => {
@@ -596,7 +604,7 @@ modalRotation.addEventListener('input', () => {
   selectedText.rotation = parseFloat(modalRotation.value);
   rotation.value = modalRotation.value;
   renderCanvas();
-  positionModalNearText(selectedText); // 회전 변경 시 모달 위치 조정
+  // 모달 위치 조정 코드 제거
 });
 
 modalCenterBtn.addEventListener('click', () => {
