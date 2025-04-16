@@ -639,5 +639,38 @@ document.addEventListener('DOMContentLoaded', function() {
       document.body.style.textSizeAdjust = '';
     });
   });
+  
+  // 확대 제스처(pinch/zoom) 방지
+  document.addEventListener('gesturestart', function(e) {
+    e.preventDefault();
+    return false;
+  }, { passive: false });
+  
+  document.addEventListener('gesturechange', function(e) {
+    e.preventDefault();
+    return false;
+  }, { passive: false });
+  
+  document.addEventListener('gestureend', function(e) {
+    e.preventDefault();
+    return false;
+  }, { passive: false });
+  
+  // 더블탭 확대 방지
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', function(e) {
+    const now = Date.now();
+    if (now - lastTouchEnd < 300) {
+      e.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, { passive: false });
+  
+  // iOS 13+ 에서 포커스 시 확대 방지를 위한 추가 처리
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches.length > 1) {
+      e.preventDefault(); // 멀티터치 방지
+    }
+  }, { passive: false });
 });
 
