@@ -318,6 +318,11 @@ document.getElementById('addTextBtn').addEventListener('click', function () {
 
   textObjects.push(newText);
   renderCanvas();
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth' // 부드럽게 스크롤 (선택적)
+  });  
 });
 
 // 선택된 텍스트의 속성을 컨트롤에 표시하는 함수
