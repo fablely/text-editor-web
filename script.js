@@ -167,34 +167,38 @@ imageLoader.addEventListener('change', function (e) {
   const reader = new FileReader();
   reader.onload = function (event) {
     img.onload = function () {
-      const dpr = window.devicePixelRatio || 1;
-    
-      const maxWidth = window.innerWidth * 0.9;
-      const maxHeight = window.innerHeight * 0.6;
-    
-      const imgAspect = img.width / img.height;
-      const boxAspect = maxWidth / maxHeight;
-    
-      let drawWidth, drawHeight;
-      if (imgAspect > boxAspect) {
-        drawWidth = maxWidth;
-        drawHeight = maxWidth / imgAspect;
+      // 원본 이미지 크기 저장
+      const originalWidth = img.width;
+      const originalHeight = img.height;
+      
+      // 캔버스 컨테이너 크기 가져오기
+      const canvasWrapper = document.querySelector('.canvas-wrapper');
+      const maxWidth = canvasWrapper.clientWidth;
+      const maxHeight = window.innerHeight * 0.7; // 화면 높이의 70% 정도로 제한
+      
+      // 이미지 비율 유지하며 캔버스 크기 조정
+      const aspectRatio = originalWidth / originalHeight;
+      
+      let canvasWidth, canvasHeight;
+      
+      if (originalWidth / originalHeight > maxWidth / maxHeight) {
+        // 이미지가 더 가로로 넓은 경우
+        canvasWidth = maxWidth;
+        canvasHeight = canvasWidth / aspectRatio;
       } else {
-        drawHeight = maxHeight;
-        drawWidth = maxHeight * imgAspect;
+        // 이미지가 더 세로로 긴 경우
+        canvasHeight = maxHeight;
+        canvasWidth = canvasHeight * aspectRatio;
       }
-    
-      // 고해상도 캔버스 설정
-      canvas.width = drawWidth * dpr;
-      canvas.height = drawHeight * dpr;
-      canvas.style.width = drawWidth + 'px';
-      canvas.style.height = drawHeight + 'px';
-    
-      // 고품질 리샘플링
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // 캔버스 스케일
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-    
+      
+      // 캔버스 크기 설정
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      
+      // CSS 스타일 설정
+      canvas.style.width = '100%';
+      canvas.style.height = 'auto';
+      
       renderCanvas();
       
       // 저장 시 원본 크기로 복원
