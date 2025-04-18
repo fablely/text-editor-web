@@ -862,52 +862,39 @@ document.getElementById('shareImageBtn').addEventListener('click', async functio
   try {
     // 공유용 임시 캔버스 생성 및 이미지 렌더링
     const tempCanvas = document.createElement('canvas');
-    // 원본 이미지 크기 사용 (모바일에서는 화면 크기에 맞춰 조정)
+    
+    // 원본 이미지 크기 그대로 사용 (크기 제한 없음)
     const originalWidth = img.width;
     const originalHeight = img.height;
     
-    // 모바일 기기에서 공유 시 파일 크기를 줄이기 위해 이미지 크기 조정
-    const maxDimension = 2048; // 최대 크기 제한
-    let shareWidth = originalWidth;
-    let shareHeight = originalHeight;
-    
-    if (originalWidth > maxDimension || originalHeight > maxDimension) {
-      if (originalWidth > originalHeight) {
-        shareWidth = maxDimension;
-        shareHeight = Math.floor(originalHeight * (maxDimension / originalWidth));
-      } else {
-        shareHeight = maxDimension;
-        shareWidth = Math.floor(originalWidth * (maxDimension / originalHeight));
-      }
-    }
-    
-    tempCanvas.width = shareWidth;
-    tempCanvas.height = shareHeight;
+    // 캔버스 크기를 원본 이미지와 동일하게 설정
+    tempCanvas.width = originalWidth;
+    tempCanvas.height = originalHeight;
     const tempCtx = tempCanvas.getContext('2d');
     
     // 원본 이미지 그리기
-    tempCtx.drawImage(img, 0, 0, shareWidth, shareHeight);
+    tempCtx.drawImage(img, 0, 0, originalWidth, originalHeight);
     
     // 텍스트 객체 그리기 (크기 비율 조정)
     textObjects.forEach(t => {
       tempCtx.save();
       tempCtx.translate(
-        t.x * (shareWidth / canvasWidth), 
-        t.y * (shareHeight / canvasHeight)
+        t.x * (originalWidth / canvasWidth), 
+        t.y * (originalHeight / canvasHeight)
       );
       tempCtx.rotate((t.rotation * Math.PI) / 180);
       tempCtx.globalAlpha = t.opacity;
-      tempCtx.font = `${t.size * (shareWidth / canvasWidth)}px ${t.font}`;
+      tempCtx.font = `${t.size * (originalWidth / canvasWidth)}px ${t.font}`;
       tempCtx.fillStyle = t.color;
       
-      const scaledSpacing = (t.letterSpacing || 0) * (shareWidth / canvasWidth);
+      const scaledSpacing = (t.letterSpacing || 0) * (originalWidth / canvasWidth);
       
       if (t.direction === 'vertical') {
         for (let i = 0; i < t.text.length; i++) {
           tempCtx.fillText(
             t.text[i], 
             0, 
-            i * (t.size + scaledSpacing) * (shareWidth / canvasWidth)
+            i * (t.size + scaledSpacing) * (originalWidth / canvasWidth)
           );
         }
       } else {
@@ -925,14 +912,29 @@ document.getElementById('shareImageBtn').addEventListener('click', async functio
       tempCtx.restore();
     });
 
-    // 캔버스를 Blob으로 변환
+    // 이미지 형식 결정 (jpg, jpeg -> image/jpeg, png -> image/png, 기타 -> image/jpeg)
+    let mimeType = "image/jpeg"; // 기본값
+    let fileExtension = "jpg";
+    
+    if (originalFileExt === "png") {
+      mimeType = "image/png";
+      fileExtension = "png";
+    } else if (originalFileExt === "jpg" || originalFileExt === "jpeg") {
+      mimeType = "image/jpeg";
+      fileExtension = originalFileExt;
+    }
+    
+    // 최고 화질 설정 (PNG는 무손실, JPEG는 최대 품질)
+    const quality = fileExtension === "png" ? 1.0 : 1.0;
+
+    // 캔버스를 Blob으로 변환 (최고 품질로 설정)
     const blob = await new Promise(resolve => {
-      tempCanvas.toBlob(resolve, 'image/jpeg', 0.85);
+      tempCanvas.toBlob(resolve, mimeType, quality);
     });
 
     // 파일 객체 생성
-    const fileName = `${originalFileName}-edited.jpg`;
-    const file = new File([blob], fileName, { type: 'image/jpeg' });
+    const fileName = `${originalFileName}-edited.${fileExtension}`;
+    const file = new File([blob], fileName, { type: mimeType });
 
     // 공유 기능 실행
     await navigator.share({
