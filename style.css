@@ -231,8 +231,13 @@ body {
     margin-bottom: 8px;
   }
   
+  /* 모달 내 라벨 그리드 레이아웃 적용 */
   .text-control-modal label {
+    display: grid;
+    grid-template-columns: 40px 1fr; /* 첫 열 40px 고정 (텍스트용), 나머지 입력 요소용 */
+    align-items: center;
     font-size: 12px;
+    gap: 8px; /* 텍스트와 입력 요소 사이 간격 */
   }
   
   .text-control-modal .small-button {
@@ -241,6 +246,15 @@ body {
     min-width: 40px;
   }
   
+  /* 모달 삭제 버튼 색상 변경 */
+  #modalDeleteBtn {
+    background-color: #ff3b30; /* 빨간색으로 변경 */
+  }
+  
+  #modalDeleteBtn:hover {
+    background-color: #cc2e25; /* 호버 시 더 어두운 빨간색 */
+  }
+
   .text-control-modal:after {
     content: '';
     position: absolute;
@@ -304,4 +318,15 @@ body {
     font-size: 14px;
     color: #8e8e93;
     margin: 5px 0 0 0;
+  }
+
+  /* 텍스트 컨트롤 숨기기 (모달에서만 편집) */
+  .controls .row:not(:first-child):not(:last-child),
+  #deleteTextBtn {
+    display: none; /* 숨김 처리 */
+  }
+
+  /* 공유 지원 관련 스타일 */
+  .no-share #shareImageBtn {
+    display: none;
   }

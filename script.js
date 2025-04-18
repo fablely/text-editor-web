@@ -54,6 +54,11 @@ const fontFiles = [
 
 // 페이지 로드 시 폰트 로드
 window.addEventListener('DOMContentLoaded', function() {
+  // Web Share API 지원 여부 확인
+  if (!navigator.share || !navigator.canShare) {
+    document.body.classList.add('no-share');
+  }
+  
   // 폰트 로드 상태를 표시할 요소 생성
   const statusDiv = document.createElement('div');
   statusDiv.id = 'fontLoadStatus';
@@ -319,11 +324,27 @@ document.getElementById('addTextBtn').addEventListener('click', function () {
   textObjects.push(newText);
   renderCanvas();
   
-  // 화면을 최상단으로 스크롤
+  // 먼저 화면을 최상단으로 스크롤
   window.scrollTo({
     top: 0,
-    behavior: 'smooth' // 부드럽게 스크롤 (선택적)
+    behavior: 'smooth' // 부드럽게 스크롤
   });
+  
+  // 스크롤이 완료된 후 텍스트를 선택하고 모달을 표시 (약간의 지연 적용)
+  setTimeout(() => {
+    // 새로 추가된 텍스트를 선택 상태로 설정
+    selectedText = newText;
+    
+    // 선택된 텍스트에 따라 모달 컨트롤 업데이트
+    updateModalControls(selectedText);
+    
+    // 선택된 텍스트 주변에 모달 위치 조정 및 표시
+    positionModalNearText(selectedText);
+    textControlModal.classList.remove('hidden');
+    
+    // 선택 상태 시각적 표시를 위해 다시 렌더링
+    renderCanvas();
+  }, 500); // 스크롤 완료 후 적절한 시간 지연 (500ms)
 });
 
 // 선택된 텍스트의 속성을 컨트롤에 표시하는 함수
@@ -827,6 +848,104 @@ saveImageBtn.addEventListener('click', () => {
     link.download = `${originalFileName}-edited.${fileExtension}`;
     link.href = dataUrl;
     link.click();
+  }
+});
+
+// 이미지 공유 버튼 이벤트 핸들러
+document.getElementById('shareImageBtn').addEventListener('click', async function() {
+  // Web Share API 지원 확인
+  if (!navigator.share) {
+    alert('죄송합니다. 이 브라우저에서는 공유 기능이 지원되지 않습니다.');
+    return;
+  }
+
+  try {
+    // 공유용 임시 캔버스 생성 및 이미지 렌더링
+    const tempCanvas = document.createElement('canvas');
+    // 원본 이미지 크기 사용 (모바일에서는 화면 크기에 맞춰 조정)
+    const originalWidth = img.width;
+    const originalHeight = img.height;
+    
+    // 모바일 기기에서 공유 시 파일 크기를 줄이기 위해 이미지 크기 조정
+    const maxDimension = 2048; // 최대 크기 제한
+    let shareWidth = originalWidth;
+    let shareHeight = originalHeight;
+    
+    if (originalWidth > maxDimension || originalHeight > maxDimension) {
+      if (originalWidth > originalHeight) {
+        shareWidth = maxDimension;
+        shareHeight = Math.floor(originalHeight * (maxDimension / originalWidth));
+      } else {
+        shareHeight = maxDimension;
+        shareWidth = Math.floor(originalWidth * (maxDimension / originalHeight));
+      }
+    }
+    
+    tempCanvas.width = shareWidth;
+    tempCanvas.height = shareHeight;
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // 원본 이미지 그리기
+    tempCtx.drawImage(img, 0, 0, shareWidth, shareHeight);
+    
+    // 텍스트 객체 그리기 (크기 비율 조정)
+    textObjects.forEach(t => {
+      tempCtx.save();
+      tempCtx.translate(
+        t.x * (shareWidth / canvasWidth), 
+        t.y * (shareHeight / canvasHeight)
+      );
+      tempCtx.rotate((t.rotation * Math.PI) / 180);
+      tempCtx.globalAlpha = t.opacity;
+      tempCtx.font = `${t.size * (shareWidth / canvasWidth)}px ${t.font}`;
+      tempCtx.fillStyle = t.color;
+      
+      const scaledSpacing = (t.letterSpacing || 0) * (shareWidth / canvasWidth);
+      
+      if (t.direction === 'vertical') {
+        for (let i = 0; i < t.text.length; i++) {
+          tempCtx.fillText(
+            t.text[i], 
+            0, 
+            i * (t.size + scaledSpacing) * (shareWidth / canvasWidth)
+          );
+        }
+      } else {
+        if (scaledSpacing !== 0) {
+          let xPos = 0;
+          for (let i = 0; i < t.text.length; i++) {
+            tempCtx.fillText(t.text[i], xPos, 0);
+            xPos += tempCtx.measureText(t.text[i]).width + scaledSpacing;
+          }
+        } else {
+          tempCtx.fillText(t.text, 0, 0);
+        }
+      }
+      
+      tempCtx.restore();
+    });
+
+    // 캔버스를 Blob으로 변환
+    const blob = await new Promise(resolve => {
+      tempCanvas.toBlob(resolve, 'image/jpeg', 0.85);
+    });
+
+    // 파일 객체 생성
+    const fileName = `${originalFileName}-edited.jpg`;
+    const file = new File([blob], fileName, { type: 'image/jpeg' });
+
+    // 공유 기능 실행
+    await navigator.share({
+      title: '페이블리 이미지',
+      text: '텍스트가 추가된 이미지를 공유합니다.',
+      files: [file]
+    });
+    
+  } catch (error) {
+    if (error.name !== 'AbortError') {
+      console.error('공유 중 오류 발생:', error);
+      alert('이미지 공유 중 문제가 발생했습니다.');
+    }
   }
 });
 

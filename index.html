@@ -66,6 +66,7 @@
 
       <button id="deleteTextBtn">선택된 텍스트 삭제</button>
       <button id="saveImageBtn">이미지 저장</button>
+      <button id="shareImageBtn">이미지 공유</button>
     </div>
   </div>
 
@@ -76,6 +77,8 @@
         <label>글꼴
           <select id="modalFontFamily"></select>
         </label>
+      </div>
+      <div class="row">
         <label>색상 <input type="color" id="modalFontColor"></label>
       </div>
       <div class="row">
@@ -84,10 +87,12 @@
       </div>
       <div class="row">
         <label>자간 <input type="range" id="modalLetterSpacing" min="-5" max="20" step="0.5" value="0"></label>
-        <label>회전 <input type="number" id="modalRotation" value="0" style="width:50px;"> °</label>
+        <label>회전 <input type="number" id="modalRotation" value="0" style="width:50px;"></label>
       </div>
       <div class="row">
-        <button id="modalCenterBtn" class="small-button">중앙</button>
+        <label>정렬 <button id="modalCenterBtn" class="small-button">중앙</button></label>
+      </div>
+      <div class="row">
         <button id="modalDeleteBtn" class="small-button">삭제</button>
         <button id="modalCloseBtn" class="small-button">닫기</button>
       </div>
