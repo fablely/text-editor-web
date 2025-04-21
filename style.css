@@ -97,11 +97,18 @@ body {
     border: none;
     border-radius: 14px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
   
   button:hover {
     background-color: #59b4acc2;
+    transform: translateY(-1px);
+  }
+  
+  button:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   }
   
   .small-button {
@@ -219,16 +226,28 @@ body {
     position: absolute;
     z-index: 900;
     background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    padding: 10px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 16px;
     width: 280px;
-    transition: transform 0.2s, opacity 0.2s;
-    border: 1px solid #d1d1d6;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    border: 1px solid rgba(209, 209, 214, 0.3);
+    animation: modal-appear 0.3s ease-out;
+  }
+  
+  @keyframes modal-appear {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   
   .text-control-modal .row {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
   
   /* 모달 내 라벨 그리드 레이아웃 적용 */
@@ -236,14 +255,21 @@ body {
     display: grid;
     grid-template-columns: 40px 1fr; /* 첫 열 40px 고정 (텍스트용), 나머지 입력 요소용 */
     align-items: center;
-    font-size: 12px;
+    font-size: 14px; /* 조금 더 크게 조정 */
     gap: 8px; /* 텍스트와 입력 요소 사이 간격 */
   }
   
   .text-control-modal .small-button {
-    padding: 4px 6px;
-    font-size: 12px;
-    min-width: 40px;
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: 60px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+  }
+  
+  .text-control-modal .small-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   
   /* 모달 삭제 버튼 색상 변경 */
@@ -253,6 +279,16 @@ body {
   
   #modalDeleteBtn:hover {
     background-color: #cc2e25; /* 호버 시 더 어두운 빨간색 */
+  }
+
+  /* 모달 닫기 버튼 스타일 */
+  #modalCloseBtn {
+    background-color: #e0e0e0;
+    color: #333;
+  }
+  
+  #modalCloseBtn:hover {
+    background-color: #d0d0d0;
   }
 
   .text-control-modal:after {
@@ -266,6 +302,16 @@ body {
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
     border-bottom: 8px solid white;
+    filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, 0.05));
+  }
+
+  /* 모달이 표시될 때는 hidden 클래스를 제거 */
+  .text-control-modal:not(.hidden) {
+    display: block;
+  }
+
+  .hidden {
+    display: none !important; /* important로 우선순위 높임 */
   }
   
   /* 페이블리 푸터 스타일 */
@@ -330,3 +376,28 @@ body {
   .no-share #shareImageBtn {
     display: none;
   }
+
+/* 폰트 로딩 상태 표시 */
+#fontLoadStatus {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+  background-color: #f2f2f7;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+/* Select 요소가 비활성화 되었을 때의 스타일 */
+select:disabled, input:disabled {
+  background-color: #f2f2f7;
+  color: #999;
+  cursor: not-allowed;
+}
