@@ -6,6 +6,7 @@ import { initTextControls } from './textControls.js';
 import { initModalControls } from './modalControls.js';
 import { initDragAndDrop } from './dragAndDrop.js';
 import { initSaveAndShare } from './saveAndShare.js';
+import { initFontPicker } from './fontPicker.js'; // 새로운 import 추가
 
 document.addEventListener('DOMContentLoaded', async () => {
   initPopup();
@@ -26,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initModalControls();
     initDragAndDrop();
     initSaveAndShare();
+    initFontPicker(); // 폰트 피커 초기화 추가
     
     // 모든 컨트롤이 활성화되었음을 알림
     console.log('모든 컨트롤 초기화 완료');
@@ -51,5 +53,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     initModalControls();
     initDragAndDrop();
     initSaveAndShare();
+    initFontPicker(); // 폰트 피커 초기화 추가
   }
 });
