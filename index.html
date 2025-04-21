@@ -7,6 +7,20 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- 모바일 폰트 피커 모달 -->
+  <div id="fontPickerModal" class="font-picker-modal hidden">
+    <div class="picker-header">
+      <button id="cancelFontPicker" class="picker-button">취소</button>
+      <span>폰트 선택</span>
+      <button id="confirmFontPicker" class="picker-button">확인</button>
+    </div>
+    <div class="picker-container">
+      <div class="picker-wheel" id="fontPickerWheel">
+        <!-- 여기에 자바스크립트로 폰트 옵션들이 추가됩니다 -->
+      </div>
+    </div>
+  </div>
+
   <!-- 팝업 모달 -->
   <div id="welcomePopup" class="popup-overlay">
     <div class="popup-content">
