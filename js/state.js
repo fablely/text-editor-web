@@ -13,5 +13,7 @@ export const state = {
   ctx: document.getElementById('canvas').getContext('2d'),
   canvasScale: window.devicePixelRatio || 1,
   canvasWidth: 0,
-  canvasHeight: 0
+  canvasHeight: 0,
+  scaleRatioX: 1, // 원본/표시 X축 비율
+  scaleRatioY: 1  // 원본/표시 Y축 비율
 };

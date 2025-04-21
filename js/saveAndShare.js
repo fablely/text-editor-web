@@ -12,22 +12,33 @@ export function initSaveAndShare() {
 
     state.textObjects.forEach(t => {
       tempCtx.save();
+      
+      // 위치 계산 수정: Y축 위치가 올바르게 변환되도록 보정
+      const scaleX = state.originalWidth / state.canvasWidth;
+      const scaleY = state.originalHeight / state.canvasHeight;
+      
+      // 수정된 변환: 텍스트 위치를 원본 비율에 맞게 정확히 변환
       tempCtx.translate(
-        t.x * (state.originalWidth / state.canvasWidth),
-        t.y * (state.originalHeight / state.canvasHeight)
+        t.x * scaleX,
+        t.y * scaleY
       );
+      
       tempCtx.rotate((t.rotation * Math.PI) / 180);
       tempCtx.globalAlpha = t.opacity;
-      tempCtx.font = `${t.size * (state.originalWidth / state.canvasWidth)}px ${t.font}`;
+      
+      // 폰트 크기도 비율에 맞게 정확히 스케일링
+      const fontSize = t.size * scaleX; // X축 비율로 통일 또는 (scaleX + scaleY)/2 사용 가능
+      tempCtx.font = `${fontSize}px ${t.font}`;
       tempCtx.fillStyle = t.color;
+      tempCtx.textBaseline = 'top';
 
-      const scaledSpacing = (t.letterSpacing || 0) * (state.originalWidth / state.canvasWidth);
+      const scaledSpacing = (t.letterSpacing || 0) * scaleX;
       if (t.direction === 'vertical') {
         for (let i = 0; i < t.text.length; i++) {
           tempCtx.fillText(
             t.text[i],
             0,
-            i * (t.size + scaledSpacing) * (state.originalWidth / state.canvasWidth)
+            i * (fontSize + scaledSpacing)
           );
         }
       } else {
@@ -106,22 +117,33 @@ export function initSaveAndShare() {
 
       state.textObjects.forEach(t => {
         tempCtx.save();
+        
+        // 위치 계산 수정: Y축 위치가 올바르게 변환되도록 보정
+        const scaleX = state.originalWidth / state.canvasWidth;
+        const scaleY = state.originalHeight / state.canvasHeight;
+        
+        // 수정된 변환: 텍스트 위치를 원본 비율에 맞게 정확히 변환
         tempCtx.translate(
-          t.x * (state.originalWidth / state.canvasWidth),
-          t.y * (state.originalHeight / state.canvasHeight)
+          t.x * scaleX,
+          t.y * scaleY
         );
+        
         tempCtx.rotate((t.rotation * Math.PI) / 180);
         tempCtx.globalAlpha = t.opacity;
-        tempCtx.font = `${t.size * (state.originalWidth / state.canvasWidth)}px ${t.font}`;
+        
+        // 폰트 크기도 비율에 맞게 정확히 스케일링
+        const fontSize = t.size * scaleX; // X축 비율로 통일
+        tempCtx.font = `${fontSize}px ${t.font}`;
         tempCtx.fillStyle = t.color;
+        tempCtx.textBaseline = 'top';
 
-        const scaledSpacing = (t.letterSpacing || 0) * (state.originalWidth / state.canvasWidth);
+        const scaledSpacing = (t.letterSpacing || 0) * scaleX;
         if (t.direction === 'vertical') {
           for (let i = 0; i < t.text.length; i++) {
             tempCtx.fillText(
               t.text[i],
               0,
-              i * (t.size + scaledSpacing) * (state.originalWidth / state.canvasWidth)
+              i * (fontSize + scaledSpacing)
             );
           }
         } else {

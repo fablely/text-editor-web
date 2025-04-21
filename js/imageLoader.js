@@ -39,12 +39,20 @@ export function initImageLoader() {
         state.canvas.width = displayWidth * dpr;
         state.canvas.height = displayHeight * dpr;
         state.ctx.scale(dpr, dpr);
+        
+        // 캔버스 디스플레이 크기 정확히 저장
         state.canvasWidth = displayWidth;
         state.canvasHeight = displayHeight;
+        
+        // 원본 이미지와 디스플레이 간의 비율도 저장
+        state.scaleRatioX = state.originalWidth / displayWidth;
+        state.scaleRatioY = state.originalHeight / displayHeight;
+        
         state.ctx.imageSmoothingEnabled = true;
         state.ctx.imageSmoothingQuality = 'high';
 
         renderCanvas();
+        console.log(`이미지 로드됨: 원본 크기=${ow}x${oh}, 표시 크기=${displayWidth}x${displayHeight}, 비율=${state.scaleRatioX}x${state.scaleRatioY}`);
       };
       state.img.src = event.target.result;
     };
