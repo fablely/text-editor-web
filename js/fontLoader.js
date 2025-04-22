@@ -20,60 +20,72 @@ export const fontFiles = [
   '평창평화체.ttf'
 ];
 
-// 폰트 로드 완료를 추적하기 위한 Promise 추가
 export let fontsLoadedPromise;
 
 export function loadFonts() {
   const statusDiv = document.createElement('div');
   statusDiv.id = 'fontLoadStatus';
-  statusDiv.style.cssText = 'font-size:12px;color:#666;margin-top:5px;';
+  statusDiv.style.cssText = 'font-size:12px;color:#666;margin-top:5px;background-color:#f2f2f7;padding:4px 8px;border-radius:4px;text-align:center;';
   const fontFamily = document.getElementById('fontFamily');
   const modalFontFamily = document.getElementById('modalFontFamily');
-  fontFamily.parentNode.insertAdjacentElement('afterend', statusDiv);
+  
+  if (fontFamily && fontFamily.parentNode) {
+    fontFamily.parentNode.insertAdjacentElement('afterend', statusDiv);
+  }
+  
   statusDiv.textContent = '폰트 로드 중...';
 
   let loadedCount = 0, failedCount = 0;
   const loadedFonts = [];
+  
+  // 기본 폰트 먼저 추가 (폰트 로딩에 실패해도 기본 기능이 동작하도록)
+  loadedFonts.push({ name: 'sans-serif', face: null });
 
   // Promise로 폰트 로딩 완료 시점을 추적
   fontsLoadedPromise = new Promise((resolve) => {
-    const promises = fontFiles.map(file => {
+    // 폰트 파일이 없는 경우를 대비
+    if (fontFiles.length === 0) {
+      console.log('폰트 파일이 없습니다. 기본 폰트만 사용합니다.');
+      updateFontSelects(loadedFonts, fontFamily, modalFontFamily, statusDiv);
+      resolve(loadedFonts);
+      return;
+    }
+    
+    // 개별 폰트 로딩 제한 시간 설정 (3초)
+    const fontPromises = fontFiles.map(file => {
       const name = file.replace(/\.[^.]+$/, '');
-      return new FontFace(name, `url(./Fonts/${encodeURIComponent(file)})`)
-        .load()
-        .then(face => {
-          document.fonts.add(face);
-          loadedFonts.push({ name, face });
-        })
-        .catch(() => { failedCount++; })
-        .finally(() => {
-          loadedCount++;
-          statusDiv.textContent = `폰트 로드: ${loadedCount}개 성공, ${failedCount}개 실패`;
-          if (loadedCount + failedCount === fontFiles.length) {
-            loadedFonts.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-            [fontFamily, modalFontFamily].forEach(select => {
-              select.innerHTML = '';
-              loadedFonts.forEach(f => {
-                const opt = document.createElement('option');
-                opt.value = f.name;
-                opt.textContent = f.name;
-                opt.style.fontFamily = f.name;
-                select.append(opt);
-              });
-            });
-            statusDiv.textContent = `폰트 로드 완료: ${loadedFonts.length}개`;
-            setTimeout(() => statusDiv.remove(), 1800);
-            
-            // 모든 폰트 로딩 완료 후 resolve 호출
-            resolve(loadedFonts);
-          }
-        });
+      
+      return Promise.race([
+        new FontFace(name, `url(./Fonts/${encodeURIComponent(file)})`)
+          .load()
+          .then(face => {
+            document.fonts.add(face);
+            loadedFonts.push({ name, face });
+          }),
+        new Promise(resolve => setTimeout(resolve, 3000)) // 개별 폰트 타임아웃
+      ])
+      .catch(() => { 
+        failedCount++; 
+        console.warn(`${name} 폰트 로드 실패`);
+      })
+      .finally(() => {
+        loadedCount++;
+        statusDiv.textContent = `폰트 로드: ${loadedCount}개 성공, ${failedCount}개 실패`;
+        
+        // 모든 폰트 로드 시도가 완료되면 선택기 업데이트
+        if (loadedCount + failedCount === fontFiles.length) {
+          updateFontSelects(loadedFonts, fontFamily, modalFontFamily, statusDiv);
+          resolve(loadedFonts);
+        }
+      });
     });
     
-    // 모든 폰트가 실패해도 UI가 동작할 수 있도록 Promise.all 대신 일정 시간 후 resolve
+    // 전체 폰트 로딩 제한 시간 (5초)
     setTimeout(() => {
       if (loadedCount + failedCount < fontFiles.length) {
-        console.warn('일부 폰트 로딩 타임아웃 발생');
+        statusDiv.textContent = `폰트 로드: 일부만 완료됨 (${loadedCount}/${fontFiles.length})`;
+        updateFontSelects(loadedFonts, fontFamily, modalFontFamily, statusDiv);
+        console.warn('폰트 로딩 타임아웃 - 일부 폰트만 사용 가능합니다');
         resolve(loadedFonts);
       }
     }, 5000);
@@ -81,8 +93,40 @@ export function loadFonts() {
 
   // 로딩 중에도 기본 폰트를 추가하여 빈 드롭다운이 안 보이도록 함
   [fontFamily, modalFontFamily].forEach(select => {
-    select.innerHTML = '<option value="sans-serif">기본 글꼴</option>';
+    if (select) {
+      select.innerHTML = '<option value="sans-serif">기본 글꼴</option>';
+    }
   });
   
   return fontsLoadedPromise;
+}
+
+// 폰트 선택기 업데이트 함수 (중복 코드 제거)
+function updateFontSelects(loadedFonts, fontFamily, modalFontFamily, statusDiv) {
+  // 폰트 이름으로 정렬
+  loadedFonts.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+  
+  // 선택기 업데이트 (존재하는 경우에만)
+  [fontFamily, modalFontFamily].forEach(select => {
+    if (!select) return;
+    
+    select.innerHTML = ''; // 기존 옵션 제거
+    loadedFonts.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.name;
+      opt.textContent = f.name;
+      opt.style.fontFamily = f.name;
+      select.append(opt);
+    });
+  });
+  
+  // 상태 표시 후 제거
+  statusDiv.textContent = `폰트 로드 완료: ${loadedFonts.length - 1}개`;  // 기본 폰트 1개 제외
+  setTimeout(() => {
+    try {
+      statusDiv.remove();
+    } catch (e) {
+      console.warn('폰트 로드 상태 요소를 제거할 수 없습니다:', e);
+    }
+  }, 1800);
 }
