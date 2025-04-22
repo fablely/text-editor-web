@@ -487,6 +487,7 @@ select:disabled, input:disabled {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: y mandatory;
+  padding: 80px 0; /* 상하단 패딩 추가 */
 }
 
 /* 선택 가이드라인 */
@@ -495,13 +496,13 @@ select:disabled, input:disabled {
   left: 0;
   right: 0;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-20px); /* 정확히 폰트 높이의 절반만큼 위로 올림 */
   height: 40px;
   border-top: 1px solid #e0e0e0;
   border-bottom: 1px solid #e0e0e0;
   pointer-events: none;
   z-index: 1;
-  background-color: rgba(89, 180, 173, 0.05);
+  background-color: rgba(89, 180, 173, 0.1); /* 약간 더 진하게 */
 }
 
 .font-option {
@@ -518,6 +519,12 @@ select:disabled, input:disabled {
 .font-option.selected {
   color: #59b4ad;
   font-weight: bold;
+}
+
+/* 공간 확보용 더미 요소 */
+.font-option-spacer {
+  height: 80px;
+  pointer-events: none;
 }
 
 /* 모바일에서 드롭다운 스타일 변경 */
