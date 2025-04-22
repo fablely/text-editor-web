@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>페이블리 사진에 텍스트 추가</title>
-
+  <title>페이블리의 사진에 텍스트 추가하기 - 사진에 글씨 넣기 무료 웹에디터</title>
+  <meta name="description" content="사진에 글씨를 쉽게 추가하고 다운로드할 수 있는 무료 웹툴입니다. 사진에 텍스트 삽입, 이미지에 글자쓰기 기능을 지원합니다.">
+  <meta name="keywords" content="사진에 텍스트 추가, 사진에 글씨 넣기, 이미지에 글자 쓰기, 워터마크 추가, 무료 이미지 편집기">
+  <meta name="robots" content="index, follow">
+  
   <!-- Google 사이트 소유권 확인 메타 태그 -->
   <meta name="google-site-verification" content="UqXJ4SXnz03TZp-vu6td1G92QxfQk84OyD0wmJTmPgw" />
   
@@ -52,6 +55,7 @@
   <div id="welcomePopup" class="popup-overlay">
     <div class="popup-content">
       <p>해당 페이지는<br>서버에 사진을 보관하지 않습니다.<br> 안심하고 사용하세요.</p>
+      <p>이 웹페이지는 사진에 글씨를 추가하거나, 이미지를 꾸미는 기능을 무료로 제공합니다. 지금 바로 사진에 원하는 텍스트를 삽입하고 다운로드하세요.</p>
       <button id="confirmBtn" class="popup-button">확인</button>
     </div>
   </div>
@@ -167,21 +171,5 @@
   </footer>
 
   <script type="module" src="js/main.js"></script>
-  <script>
-    // 팝업 관련 스크립트
-    document.addEventListener('DOMContentLoaded', function() {
-      const popup = document.getElementById('welcomePopup');
-      const confirmBtn = document.getElementById('confirmBtn');
-      
-      // 페이지 로드 시 에디터 컨테이너 숨기기
-      document.querySelector('.editor-container').style.display = 'none';
-      
-      // 확인 버튼 클릭 시 팝업 닫기
-      confirmBtn.addEventListener('click', function() {
-        popup.classList.add('hidden');
-        document.querySelector('.editor-container').style.display = 'block';
-      });
-    });
-  </script>
 </body>
 </html>
