@@ -13,24 +13,40 @@ export function initFontPicker() {
   const cancelFontPicker = document.getElementById('cancelFontPicker');
   const confirmFontPicker = document.getElementById('confirmFontPicker');
   
-  // 모바일 환경에서만 커스텀 선택기 사용
+  // 모든 기기에서 커스텀 선택기 사용
   const isMobile = window.innerWidth <= 768;
-  if (!isMobile) return;
 
-  // 폰트 패밀리 선택기에 클릭 이벤트 추가
+  // 폰트 패밀리 선택기에 이벤트 추가 - 모바일에선 click, 데스크톱에선 mousedown
   const fontSelectors = [
     document.getElementById('fontFamily'),
     document.getElementById('modalFontFamily')
   ];
 
   fontSelectors.forEach(selector => {
-    selector.addEventListener('click', function(e) {
-      // 모바일에서만 기본 동작 방지 및 커스텀 선택기 표시
+    // 모바일과 데스크톱 모두에서 드롭다운 동작 방지
+    selector.addEventListener('mousedown', function(e) {
       if (isMobile) {
         e.preventDefault();
         openFontPicker(this);
       }
     });
+    
+    selector.addEventListener('click', function(e) {
+      if (isMobile) {
+        e.preventDefault();
+        e.stopPropagation(); // 이벤트 버블링 중지
+        openFontPicker(this);
+        return false;
+      }
+    });
+    
+    // 추가: 터치 이벤트에서도 동작 방지
+    selector.addEventListener('touchstart', function(e) {
+      if (isMobile) {
+        e.preventDefault();
+        openFontPicker(this);
+      }
+    }, { passive: false });
   });
 
   // 취소 버튼 클릭 시 모달 닫기
@@ -46,10 +62,27 @@ export function initFontPicker() {
     fontPickerModal.classList.remove('visible');
   });
 
+  // 폰트 옵션 클릭 이벤트 (직접 선택 가능하도록)
+  fontPickerWheel.addEventListener('click', (e) => {
+    if (e.target.classList.contains('font-option')) {
+      // 모든 옵션에서 선택 클래스 제거
+      const options = fontPickerWheel.querySelectorAll('.font-option');
+      options.forEach(opt => opt.classList.remove('selected'));
+      
+      // 클릭한 옵션에 선택 클래스 추가
+      e.target.classList.add('selected');
+      selectedFontIndex = parseInt(e.target.dataset.index);
+      
+      // 선택 옵션으로 스크롤
+      const optionHeight = 40;
+      fontPickerWheel.scrollTop = selectedFontIndex * optionHeight;
+    }
+  });
+
   // 폰트 피커 휠 스크롤 이벤트
   fontPickerWheel.addEventListener('scroll', debounce(function() {
     updateSelectedFont();
-  }, 100));
+  }, 50));
 }
 
 // 폰트 선택기 열기
@@ -126,7 +159,11 @@ function applyFontSelection() {
   if (!currentFontSelector || selectedFontIndex === -1) return;
   
   // 선택기 값 변경
-  currentFontSelector.selectedIndex = selectedFontIndex;
+  currentFontSelector.value = fontOptions[selectedFontIndex].value;
+  
+  // 커스텀 이벤트 생성 및 디스패치 (change 이벤트 트리거)
+  const event = new Event('change', { bubbles: true });
+  currentFontSelector.dispatchEvent(event);
   
   // 선택된 텍스트가 있으면 폰트 변경 적용
   if (state.selectedText) {
@@ -145,6 +182,8 @@ function applyFontSelection() {
     renderCanvas();
     updateModalControls(state.selectedText);
   }
+  
+  console.log(`폰트 변경: ${fontOptions[selectedFontIndex].text}`);
 }
 
 // 디바운스 함수
