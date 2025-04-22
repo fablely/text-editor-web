@@ -132,6 +132,9 @@ export function updateModalControls(textObj) {
   document.getElementById('modalOpacity').value = textObj.opacity;
   document.getElementById('modalLetterSpacing').value = textObj.letterSpacing || 0;
   document.getElementById('modalRotation').value = textObj.rotation;
+  
+  // 방향 값 업데이트 추가
+  document.getElementById('modalTextDirection').value = textObj.direction;
 }
 
 export function updateControlsFromText(textObj) {

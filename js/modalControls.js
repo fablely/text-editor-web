@@ -41,6 +41,13 @@ export function initModalControls() {
     renderCanvas();
   });
 
+  // 방향 선택 이벤트 리스너 추가
+  document.getElementById('modalTextDirection').addEventListener('change', e => {
+    if (!state.selectedText) return;
+    state.selectedText.direction = e.target.value;
+    renderCanvas();
+  });
+
   document.getElementById('modalCenterBtn').addEventListener('click', () => {
     document.getElementById('centerTextBtn').click();
     if (state.selectedText) positionModalNearText(state.selectedText);
