@@ -415,10 +415,19 @@ select:disabled, input:disabled {
   z-index: 1100;
   transform: translateY(100%);
   transition: transform 0.3s ease;
+  display: none; /* 초기 상태는 완전히 숨김 */
 }
 
 .font-picker-modal.visible {
   transform: translateY(0);
+}
+
+.font-picker-modal.hidden {
+  transform: translateY(100%);
+}
+
+.font-picker-modal:not(.hidden) {
+  display: block;
 }
 
 .picker-header {
@@ -488,11 +497,25 @@ select:disabled, input:disabled {
   justify-content: center;
   font-size: 18px;
   scroll-snap-align: center;
+  padding: 0 20px;
 }
 
 .font-option.selected {
   color: #59b4ad;
   font-weight: bold;
+}
+
+/* 모바일에서 드롭다운 스타일 변경 */
+@media (max-width: 768px) {
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8.5l-4-4h8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 24px;
+  }
 }
 
 /* 모달이 표시될 때는 hidden 클래스를 제거 */
