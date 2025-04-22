@@ -115,6 +115,18 @@ export function positionModalNearText(textObj) {
 
 export function updateModalControls(textObj) {
   document.getElementById('modalFontFamily').value = textObj.font;
+  
+  // 모달 폰트 디스플레이 업데이트
+  const modalFontDisplay = document.getElementById('modalFontDisplay');
+  if (modalFontDisplay) {
+    const fontFamily = document.getElementById('fontFamily');
+    const option = Array.from(fontFamily.options).find(opt => opt.value === textObj.font);
+    if (option) {
+      modalFontDisplay.textContent = option.textContent;
+      modalFontDisplay.style.fontFamily = option.value;
+    }
+  }
+  
   document.getElementById('modalFontSize').value = textObj.size;
   document.getElementById('modalFontColor').value = textObj.color;
   document.getElementById('modalOpacity').value = textObj.opacity;

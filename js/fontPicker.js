@@ -13,40 +13,52 @@ export function initFontPicker() {
   const cancelFontPicker = document.getElementById('cancelFontPicker');
   const confirmFontPicker = document.getElementById('confirmFontPicker');
   
-  // 모든 기기에서 커스텀 선택기 사용
+  // 모바일 환경에서 폰트 선택기 초기화
   const isMobile = window.innerWidth <= 768;
 
-  // 폰트 패밀리 선택기에 이벤트 추가 - 모바일에선 click, 데스크톱에선 mousedown
+  // 새로운 모달 폰트 선택기 요소
+  const modalFontSelector = document.getElementById('modalFontSelector');
+  const modalFontDisplay = document.getElementById('modalFontDisplay');
+  const hiddenModalFontFamily = document.getElementById('modalFontFamily');
+
+  // 폰트 패밀리 선택기
   const fontSelectors = [
-    document.getElementById('fontFamily'),
-    document.getElementById('modalFontFamily')
+    { 
+      selector: document.getElementById('fontFamily'),
+      display: null, // 메인 폰트 선택기는 기존 select 요소 그대로 사용
+      type: 'main'
+    },
+    {
+      selector: hiddenModalFontFamily,
+      display: modalFontDisplay, // 모달의 폰트 선택기는 커스텀 디스플레이 사용
+      type: 'modal'
+    }
   ];
 
-  fontSelectors.forEach(selector => {
-    // 모바일과 데스크톱 모두에서 드롭다운 동작 방지
-    selector.addEventListener('mousedown', function(e) {
-      if (isMobile) {
-        e.preventDefault();
-        openFontPicker(this);
-      }
+  // 모바일 환경에서 메인 폰트 선택기 이벤트 설정
+  if (isMobile) {
+    const mainFontSelector = document.getElementById('fontFamily');
+    mainFontSelector.addEventListener('click', function(e) {
+      e.preventDefault();
+      openFontPicker(fontSelectors[0]);
+      return false;
     });
     
-    selector.addEventListener('click', function(e) {
-      if (isMobile) {
-        e.preventDefault();
-        e.stopPropagation(); // 이벤트 버블링 중지
-        openFontPicker(this);
-        return false;
-      }
+    // 모바일에서는 포커스와 터치 이벤트도 차단
+    mainFontSelector.addEventListener('focus', function(e) {
+      e.preventDefault();
+      this.blur();
     });
     
-    // 추가: 터치 이벤트에서도 동작 방지
-    selector.addEventListener('touchstart', function(e) {
-      if (isMobile) {
-        e.preventDefault();
-        openFontPicker(this);
-      }
+    mainFontSelector.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      openFontPicker(fontSelectors[0]);
     }, { passive: false });
+  }
+
+  // 모달 폰트 선택기 이벤트 설정 (모든 환경에서)
+  modalFontSelector.addEventListener('click', function() {
+    openFontPicker(fontSelectors[1]);
   });
 
   // 취소 버튼 클릭 시 모달 닫기
@@ -62,7 +74,7 @@ export function initFontPicker() {
     fontPickerModal.classList.remove('visible');
   });
 
-  // 폰트 옵션 클릭 이벤트 (직접 선택 가능하도록)
+  // 폰트 옵션 클릭 이벤트
   fontPickerWheel.addEventListener('click', (e) => {
     if (e.target.classList.contains('font-option')) {
       // 모든 옵션에서 선택 클래스 제거
@@ -83,19 +95,25 @@ export function initFontPicker() {
   fontPickerWheel.addEventListener('scroll', debounce(function() {
     updateSelectedFont();
   }, 50));
+
+  // 초기 모달 폰트 디스플레이 설정
+  updateFontDisplay();
 }
 
 // 폰트 선택기 열기
-function openFontPicker(selector) {
-  currentFontSelector = selector;
+function openFontPicker(selectorObj) {
+  currentFontSelector = selectorObj;
   const fontPickerModal = document.getElementById('fontPickerModal');
   const fontPickerWheel = document.getElementById('fontPickerWheel');
   
   // 기존 옵션 제거
   fontPickerWheel.innerHTML = '';
   
-  // 폰트 옵션 가져오기
-  fontOptions = Array.from(selector.options).map(option => {
+  const selector = selectorObj.selector;
+  
+  // 폰트 옵션 가져오기 (메인 폰트 선택기에서 옵션 가져옴)
+  const mainSelector = document.getElementById('fontFamily');
+  fontOptions = Array.from(mainSelector.options).map(option => {
     return {
       value: option.value,
       text: option.textContent
@@ -158,32 +176,58 @@ function updateSelectedFont() {
 function applyFontSelection() {
   if (!currentFontSelector || selectedFontIndex === -1) return;
   
+  const selector = currentFontSelector.selector;
+  const display = currentFontSelector.display;
+  const type = currentFontSelector.type;
+  
   // 선택기 값 변경
-  currentFontSelector.value = fontOptions[selectedFontIndex].value;
+  selector.value = fontOptions[selectedFontIndex].value;
   
-  // 커스텀 이벤트 생성 및 디스패치 (change 이벤트 트리거)
-  const event = new Event('change', { bubbles: true });
-  currentFontSelector.dispatchEvent(event);
-  
+  // 모달의 경우 표시 요소도 업데이트
+  if (display) {
+    display.textContent = fontOptions[selectedFontIndex].text;
+    display.style.fontFamily = fontOptions[selectedFontIndex].value;
+  }
+
   // 선택된 텍스트가 있으면 폰트 변경 적용
   if (state.selectedText) {
     state.selectedText.font = fontOptions[selectedFontIndex].value;
     
-    // 모달 폰트 선택기를 사용한 경우, 메인 폰트 선택기도 업데이트
-    if (currentFontSelector.id === 'modalFontFamily') {
+    // 두 폰트 선택기 동기화
+    if (type === 'modal') {
       document.getElementById('fontFamily').value = fontOptions[selectedFontIndex].value;
-    } 
-    // 메인 폰트 선택기를 사용한 경우, 모달 폰트 선택기도 업데이트
-    else if (currentFontSelector.id === 'fontFamily') {
+    } else {
       document.getElementById('modalFontFamily').value = fontOptions[selectedFontIndex].value;
+      document.getElementById('modalFontDisplay').textContent = fontOptions[selectedFontIndex].text;
+      document.getElementById('modalFontDisplay').style.fontFamily = fontOptions[selectedFontIndex].value;
     }
     
     // 캔버스 다시 그리기
     renderCanvas();
     updateModalControls(state.selectedText);
   }
-  
-  console.log(`폰트 변경: ${fontOptions[selectedFontIndex].text}`);
+
+  updateFontDisplay();
+}
+
+// 모달 폰트 디스플레이 업데이트
+function updateFontDisplay() {
+  const modalFontFamily = document.getElementById('modalFontFamily');
+  const modalFontDisplay = document.getElementById('modalFontDisplay');
+
+  if (modalFontFamily && modalFontDisplay) {
+    const fontValue = modalFontFamily.value;
+    const mainSelector = document.getElementById('fontFamily');
+    const option = Array.from(mainSelector.options).find(opt => opt.value === fontValue);
+    
+    if (option) {
+      modalFontDisplay.textContent = option.textContent;
+      modalFontDisplay.style.fontFamily = option.value;
+    } else {
+      modalFontDisplay.textContent = '기본 글꼴';
+      modalFontDisplay.style.fontFamily = 'sans-serif';
+    }
+  }
 }
 
 // 디바운스 함수
