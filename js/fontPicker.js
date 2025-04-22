@@ -124,6 +124,12 @@ function openFontPicker(selectorObj) {
   selectedFontIndex = fontOptions.findIndex(option => option.value === selector.value);
   if (selectedFontIndex === -1) selectedFontIndex = 0;
 
+  // 더미 공간을 앞뒤에 추가하여 중간 선택이 가능하도록 함
+  const dummyBefore = document.createElement('div');
+  dummyBefore.className = 'font-option-spacer';
+  dummyBefore.style.height = '80px'; // 상단 여백
+  fontPickerWheel.appendChild(dummyBefore);
+  
   // 옵션 요소 추가
   fontOptions.forEach((option, index) => {
     const div = document.createElement('div');
@@ -134,6 +140,12 @@ function openFontPicker(selectorObj) {
     div.dataset.index = index;
     fontPickerWheel.appendChild(div);
   });
+  
+  // 더미 공간을 뒤에 추가
+  const dummyAfter = document.createElement('div');
+  dummyAfter.className = 'font-option-spacer';
+  dummyAfter.style.height = '80px'; // 하단 여백
+  fontPickerWheel.appendChild(dummyAfter);
 
   // 모달 표시
   fontPickerModal.classList.remove('hidden');
@@ -158,8 +170,9 @@ function updateSelectedFont() {
   const containerHeight = fontPickerWheel.clientHeight;
   const scrollTop = fontPickerWheel.scrollTop;
   
-  // 스크롤 위치에 따라 중앙에 있는 옵션 찾기
-  const centerIndex = Math.round((scrollTop + containerHeight / 2 - 80) / optionHeight);
+  // 스크롤 위치에 따라 중앙에 있는 옵션 찾기 (정확한 위치 계산)
+  const centerPosition = scrollTop + containerHeight / 2;
+  const centerIndex = Math.round(centerPosition / optionHeight) - 2; // 패딩 영역 고려하여 보정
   
   // 범위 검사
   if (centerIndex >= 0 && centerIndex < options.length) {
@@ -169,7 +182,53 @@ function updateSelectedFont() {
     // 새 선택 항목에 클래스 추가
     options[centerIndex].classList.add('selected');
     selectedFontIndex = centerIndex;
+    
+    // 폰트 변경을 즉시 미리보기로 적용 (실시간 업데이트)
+    previewFontSelection();
   }
+}
+
+// 폰트 선택 미리보기 (실시간 업데이트)
+function previewFontSelection() {
+  if (!currentFontSelector || selectedFontIndex === -1) return;
+  
+  const selector = currentFontSelector.selector;
+  const display = currentFontSelector.display;
+  
+  // 선택기 값과 디스플레이 업데이트
+  selector.value = fontOptions[selectedFontIndex].value;
+  
+  if (display) {
+    display.textContent = fontOptions[selectedFontIndex].text;
+    display.style.fontFamily = fontOptions[selectedFontIndex].value;
+  }
+
+  // 선택된 텍스트가 있으면 폰트 변경 적용
+  if (state.selectedText) {
+    // 원래 폰트 저장
+    const originalFont = state.selectedText.font;
+    
+    // 새 폰트로 임시 변경
+    state.selectedText.font = fontOptions[selectedFontIndex].value;
+    
+    // 두 폰트 선택기 동기화
+    if (currentFontSelector.type === 'modal') {
+      document.getElementById('fontFamily').value = fontOptions[selectedFontIndex].value;
+    } else {
+      document.getElementById('modalFontFamily').value = fontOptions[selectedFontIndex].value;
+      const modalFontDisplay = document.getElementById('modalFontDisplay');
+      if (modalFontDisplay) {
+        modalFontDisplay.textContent = fontOptions[selectedFontIndex].text;
+        modalFontDisplay.style.fontFamily = fontOptions[selectedFontIndex].value;
+      }
+    }
+    
+    // 캔버스 다시 그리기
+    renderCanvas();
+  }
+  
+  // 콘솔에 로그 출력 (디버깅용)
+  console.log(`미리보기 폰트: ${fontOptions[selectedFontIndex].text}`);
 }
 
 // 선택된 폰트 적용
@@ -208,6 +267,9 @@ function applyFontSelection() {
   }
 
   updateFontDisplay();
+  
+  // 콘솔에 로그 출력 (디버깅용)
+  console.log(`최종 선택 폰트: ${fontOptions[selectedFontIndex].text}`);
 }
 
 // 모달 폰트 디스플레이 업데이트
