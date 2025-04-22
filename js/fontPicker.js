@@ -65,6 +65,8 @@ export function initFontPicker() {
   cancelFontPicker.addEventListener('click', () => {
     fontPickerModal.classList.add('hidden');
     fontPickerModal.classList.remove('visible');
+    // 본문 스크롤 다시 활성화
+    document.body.classList.remove('no-scroll');
   });
 
   // 확인 버튼 클릭 시 선택 적용 및 모달 닫기
@@ -72,6 +74,8 @@ export function initFontPicker() {
     applyFontSelection();
     fontPickerModal.classList.add('hidden');
     fontPickerModal.classList.remove('visible');
+    // 본문 스크롤 다시 활성화 (applyFontSelection에서 처리하지만 안전하게 중복 처리)
+    document.body.classList.remove('no-scroll');
   });
 
   // 폰트 옵션 클릭 이벤트
@@ -98,6 +102,16 @@ export function initFontPicker() {
 
   // 초기 모달 폰트 디스플레이 설정
   updateFontDisplay();
+
+  // 모달 내 터치 이벤트가 본문으로 전파되지 않도록 방지
+  fontPickerModal.addEventListener('touchmove', function(e) {
+    e.stopPropagation();
+  }, { passive: false });
+
+  // 폰트 피커 휠에 특별히 스크롤 가능하도록 설정
+  fontPickerWheel.addEventListener('touchmove', function(e) {
+    // 이벤트 전파 중지하지 않음 (스크롤 허용)
+  }, { passive: true });
 }
 
 // 폰트 선택기 열기
@@ -105,6 +119,9 @@ function openFontPicker(selectorObj) {
   currentFontSelector = selectorObj;
   const fontPickerModal = document.getElementById('fontPickerModal');
   const fontPickerWheel = document.getElementById('fontPickerWheel');
+  
+  // 본문 스크롤 방지
+  document.body.classList.add('no-scroll');
   
   // 기존 옵션 제거
   fontPickerWheel.innerHTML = '';
@@ -251,6 +268,9 @@ function applyFontSelection() {
   }
 
   updateFontDisplay();
+  
+  // 본문 스크롤 다시 활성화
+  document.body.classList.remove('no-scroll');
   
   // 콘솔에 로그 출력 (디버깅용)
   console.log(`최종 선택 폰트: ${fontOptions[selectedFontIndex].text}`);
