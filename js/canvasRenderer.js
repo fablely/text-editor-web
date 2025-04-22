@@ -135,6 +135,13 @@ export function updateModalControls(textObj) {
   
   // 방향 값 업데이트 추가
   document.getElementById('modalTextDirection').value = textObj.direction;
+  
+  // 방향 버튼 업데이트
+  const isHorizontal = textObj.direction === 'horizontal';
+  document.getElementById('horizontalBtn').classList.toggle('active-dir', isHorizontal);
+  document.getElementById('verticalBtn').classList.toggle('active-dir', !isHorizontal);
+  document.getElementById('modalHorizontalBtn').classList.toggle('active-dir', isHorizontal);
+  document.getElementById('modalVerticalBtn').classList.toggle('active-dir', !isHorizontal);
 }
 
 export function updateControlsFromText(textObj) {

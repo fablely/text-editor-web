@@ -93,4 +93,29 @@ export function initTextControls() {
     state.selectedText.x = canvasCenterX - textWidth / 2;
     renderCanvas();
   });
+
+  // 방향 버튼 이벤트 처리
+  document.getElementById('horizontalBtn').addEventListener('click', () => {
+    setDirection('horizontal');
+  });
+  
+  document.getElementById('verticalBtn').addEventListener('click', () => {
+    setDirection('vertical');
+  });
+  
+  function setDirection(direction) {
+    if (!state.selectedText) return;
+    
+    // 버튼 상태 업데이트
+    document.getElementById('horizontalBtn').classList.toggle('active-dir', direction === 'horizontal');
+    document.getElementById('verticalBtn').classList.toggle('active-dir', direction === 'vertical');
+    
+    // 모달 버튼도 동기화
+    document.getElementById('modalHorizontalBtn').classList.toggle('active-dir', direction === 'horizontal');
+    document.getElementById('modalVerticalBtn').classList.toggle('active-dir', direction === 'vertical');
+    
+    // 텍스트 방향 설정
+    state.selectedText.direction = direction;
+    renderCanvas();
+  }
 }
