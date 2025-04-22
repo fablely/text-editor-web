@@ -88,7 +88,11 @@
     <div class="modal-content">
       <div class="row">
         <label>글꼴
-          <select id="modalFontFamily"></select>
+          <div id="modalFontSelector" class="font-selector">
+            <span id="modalFontDisplay"></span>
+            <input type="hidden" id="modalFontFamily">
+            <span class="selector-arrow">▼</span>
+          </div>
         </label>
       </div>
       <div class="row">
