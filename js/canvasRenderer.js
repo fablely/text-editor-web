@@ -133,12 +133,8 @@ export function updateModalControls(textObj) {
   document.getElementById('modalLetterSpacing').value = textObj.letterSpacing || 0;
   document.getElementById('modalRotation').value = textObj.rotation;
   
-  // 방향 버튼 상태 업데이트
-  const isHorizontal = textObj.direction === 'horizontal';
-  document.getElementById('modalHorizontalBtn').classList.toggle('active-dir', isHorizontal);
-  document.getElementById('modalVerticalBtn').classList.toggle('active-dir', !isHorizontal);
-  document.getElementById('horizontalBtn').classList.toggle('active-dir', isHorizontal);
-  document.getElementById('verticalBtn').classList.toggle('active-dir', !isHorizontal);
+  // 방향 값 업데이트 추가
+  document.getElementById('modalTextDirection').value = textObj.direction;
 }
 
 export function updateControlsFromText(textObj) {

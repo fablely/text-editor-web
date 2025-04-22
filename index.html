@@ -91,10 +91,10 @@
       <div class="row">
         <label>회전 <input type="range" id="rotation" min="-180" max="180" value="0" step="1"> °</label>
         <label>방향
-          <div class="button-group">
-            <button id="horizontalBtn" class="dir-button active-dir small-button">가로</button>
-            <button id="verticalBtn" class="dir-button small-button">세로</button>
-          </div>
+          <select id="textDirection">
+            <option value="horizontal">가로</option>
+            <option value="vertical">세로</option>
+          </select>
         </label>
         <label>정렬
           <button id="centerTextBtn" class="small-button">중앙</button>
@@ -132,10 +132,10 @@
       </div>
       <div class="row">
         <label>방향
-          <div class="button-group">
-            <button id="modalHorizontalBtn" class="dir-button active-dir small-button">가로</button>
-            <button id="modalVerticalBtn" class="dir-button small-button">세로</button>
-          </div>
+          <select id="modalTextDirection">
+            <option value="horizontal">가로</option>
+            <option value="vertical">세로</option>
+          </select>
         </label>
       </div>
       <div class="row">

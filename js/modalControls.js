@@ -76,29 +76,4 @@ export function initModalControls() {
       renderCanvas();
     }
   });
-
-  // 모달 방향 버튼 이벤트 처리
-  document.getElementById('modalHorizontalBtn').addEventListener('click', () => {
-    setModalDirection('horizontal');
-  });
-  
-  document.getElementById('modalVerticalBtn').addEventListener('click', () => {
-    setModalDirection('vertical');
-  });
-  
-  function setModalDirection(direction) {
-    if (!state.selectedText) return;
-    
-    // 모달 버튼 상태 업데이트
-    document.getElementById('modalHorizontalBtn').classList.toggle('active-dir', direction === 'horizontal');
-    document.getElementById('modalVerticalBtn').classList.toggle('active-dir', direction === 'vertical');
-    
-    // 메인 버튼도 동기화
-    document.getElementById('horizontalBtn').classList.toggle('active-dir', direction === 'horizontal');
-    document.getElementById('verticalBtn').classList.toggle('active-dir', direction === 'vertical');
-    
-    // 텍스트 방향 설정
-    state.selectedText.direction = direction;
-    renderCanvas();
-  }
 }

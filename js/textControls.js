@@ -12,10 +12,6 @@ export function initTextControls() {
   const textDirection = document.getElementById('textDirection');
   const letterSpacing = document.getElementById('letterSpacing');
 
-  // 방향 버튼 참조
-  const horizontalBtn = document.getElementById('horizontalBtn');
-  const verticalBtn = document.getElementById('verticalBtn');
-
   // 폼 컨트롤이 준비되었는지 확인
   if (fontFamily.options.length === 0) {
     console.warn('폰트 목록이 아직 로드되지 않았습니다. 기본 글꼴을 추가합니다.');
@@ -33,9 +29,6 @@ export function initTextControls() {
 
     // 선택된 폰트 확인 및 기본값 설정
     const selectedFont = fontFamily.value || 'sans-serif';
-
-    // 방향 설정 - 활성화된 버튼에 따라 결정
-    const direction = horizontalBtn.classList.contains('active-dir') ? 'horizontal' : 'vertical';
     
     const newText = {
       text: txtInput.value,
@@ -46,7 +39,7 @@ export function initTextControls() {
       color: fontColor.value || '#ffffff',
       opacity: parseFloat(opacity.value) || 1,
       rotation: parseFloat(rotation.value) || 0,
-      direction: direction,
+      direction: textDirection.value || 'horizontal',
       letterSpacing: parseFloat(letterSpacing.value) || 0
     };
     
@@ -100,29 +93,4 @@ export function initTextControls() {
     state.selectedText.x = canvasCenterX - textWidth / 2;
     renderCanvas();
   });
-
-  // 방향 버튼 이벤트 리스너
-  horizontalBtn.addEventListener('click', () => {
-    setDirection('horizontal');
-  });
-  
-  verticalBtn.addEventListener('click', () => {
-    setDirection('vertical');
-  });
-  
-  function setDirection(direction) {
-    if (!state.selectedText) return;
-    
-    // 버튼 상태 업데이트
-    horizontalBtn.classList.toggle('active-dir', direction === 'horizontal');
-    verticalBtn.classList.toggle('active-dir', direction === 'vertical');
-    
-    // 모달 버튼도 동기화
-    document.getElementById('modalHorizontalBtn').classList.toggle('active-dir', direction === 'horizontal');
-    document.getElementById('modalVerticalBtn').classList.toggle('active-dir', direction === 'vertical');
-    
-    // 텍스트 방향 설정
-    state.selectedText.direction = direction;
-    renderCanvas();
-  }
 }
