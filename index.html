@@ -33,6 +33,11 @@
   <meta name="twitter:description" content="사진에 글씨를 쉽게 추가하고 다운로드할 수 있는 무료 웹툴입니다. 사진에 텍스트 삽입, 이미지에 글자쓰기 기능을 지원합니다.">
   <meta name="twitter:image" content="https://github.com/fablely/text-editor-web/blob/main/Img/MainImg.jpg?raw=true">
   
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -40,14 +45,78 @@
   <div id="fontPickerModal" class="font-picker-modal hidden">
     <div class="picker-header">
       <button id="cancelFontPicker" class="picker-button">취소</button>
-      <span>폰트 선택</span>
+      <h3>폰트 선택</h3>
       <button id="confirmFontPicker" class="picker-button">확인</button>
     </div>
     <div class="picker-container">
-      <!-- 가이드라인 위치 조정 -->
-      <div class="selection-guide"></div>
       <div class="picker-wheel" id="fontPickerWheel">
         <!-- 여기에 자바스크립트로 폰트 옵션들이 추가됩니다 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 방향 선택 모달 -->
+  <div id="directionPickerModal" class="font-picker-modal hidden">
+    <div class="picker-header">
+      <button id="cancelDirectionPicker" class="picker-button">취소</button>
+      <h3>방향 선택</h3>
+      <button id="confirmDirectionPicker" class="picker-button">확인</button>
+    </div>
+    <div class="picker-container">
+      <div class="picker-wheel" id="directionPickerWheel">
+        <div class="direction-option" data-value="horizontal">가로</div>
+        <div class="direction-option" data-value="vertical">세로</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스티커 선택 모달 -->
+  <div id="stickerPickerModal" class="popup-overlay hidden">
+    <div class="popup-content sticker-picker-content">
+      <h3>스티커 선택</h3>
+      <div class="sticker-grid" id="stickerGrid">
+        <!-- 스티커들이 JavaScript로 동적 생성됩니다 -->
+      </div>
+      <div class="modal-buttons">
+        <button id="cancelStickerBtn" class="popup-button secondary">취소</button>
+        <button id="confirmStickerBtn" class="popup-button">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스티커 편집용 모달 컨트롤 (텍스트 편집 모달과 동일한 구조) -->
+  <div id="stickerEditPopup" class="text-control-modal hidden">
+    <div class="modal-content">
+      <div class="slider-row">
+        <span class="slider-label">크기</span>
+        <input type="range" id="stickerSize" min="1" max="100" value="50" step="1">
+        <span id="stickerSizeValue" class="slider-value">50</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">불투명도</span>
+        <input type="range" id="stickerOpacity" min="0" max="100" value="100">
+        <span id="stickerOpacityValue" class="slider-value">100</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">회전</span>
+        <input type="range" id="stickerRotation" min="0" max="360" value="0">
+        <span id="stickerRotationValue" class="slider-value">0°</span>
+      </div>
+      
+      <!-- 레이어 순서 조정 -->
+      <div class="row layer-controls">
+        <span class="slider-label">순서</span>
+        <div class="layer-buttons">
+          <button id="stickerBringToFrontBtn" class="small-button layer-btn" title="맨앞으로">↑↑</button>
+          <button id="stickerBringForwardBtn" class="small-button layer-btn" title="앞으로">↑</button>
+          <button id="stickerSendBackwardBtn" class="small-button layer-btn" title="뒤로">↓</button>
+          <button id="stickerSendToBackBtn" class="small-button layer-btn" title="맨뒤로">↓↓</button>
+        </div>
+      </div>
+      
+      <div class="row">
+        <button id="deleteStickerBtn" class="small-button">삭제</button>
+        <button id="closeStickerEditBtn" class="small-button">닫기</button>
       </div>
     </div>
   </div>
@@ -58,6 +127,14 @@
       <p>해당 페이지는<br>서버에 사진을 보관하지 않습니다.<br> 안심하고 사용하세요.</p>
       <p>이 웹페이지는 사진에 글씨를 추가하거나,<br>이미지를 꾸미는 기능을 무료로 제공합니다.<br>지금 바로 사진에 원하는 텍스트를<br>추가하고 다운로드하세요.</p>
       <button id="confirmBtn" class="popup-button">확인</button>
+    </div>
+  </div>
+
+  <!-- 이미지 업로드 요구 팝업 -->
+  <div id="imageRequiredPopup" class="popup-overlay hidden">
+    <div class="popup-content">
+      <p>배경 이미지를 먼저 업로드해주세요.</p>
+      <button id="imageRequiredConfirmBtn" class="popup-button">확인</button>
     </div>
   </div>
 
@@ -72,9 +149,22 @@
     </div>
     
     <div class="controls">
-      <input type="text" id="textInput" placeholder="텍스트 입력">
-      
-      <button id="addTextBtn">텍스트 추가</button>
+      <!-- 기능 선택 버튼들 -->
+      <div class="feature-buttons">
+        <button id="textModeBtn" class="feature-btn active">텍스트 추가</button>
+        <button id="stickerModeBtn" class="feature-btn">스티커 추가</button>
+      </div>
+
+      <!-- 텍스트 입력 영역 (기본적으로 표시) -->
+      <div id="textInputArea" class="input-area">
+        <input type="text" id="textInput" placeholder="텍스트 입력">
+        <button id="addTextBtn">입력</button>
+      </div>
+
+      <!-- 스티커 선택 영역 (기본적으로 숨김) -->
+      <div id="stickerInputArea" class="input-area hidden">
+        <p style="text-align: center; color: #666; margin: 1px 0;">스티커를 추가하려면 위의 '스티커 추가' 버튼을 클릭하세요</p>
+      </div>
 
       <div class="row">
         <label>글꼴
@@ -119,6 +209,9 @@
   <div id="textControlModal" class="text-control-modal hidden">
     <div class="modal-content">
       <div class="row">
+        <label>내용 <input type="text" id="modalTextContent" placeholder="텍스트 입력"></label>
+      </div>
+      <div class="row">
         <label>글꼴
           <div id="modalFontSelector" class="font-selector">
             <span id="modalFontDisplay"></span>
@@ -130,25 +223,50 @@
       <div class="row">
         <label>색상 <input type="color" id="modalFontColor"></label>
       </div>
-      <div class="row">
-        <label>크기 <input type="range" id="modalFontSize" min="10" max="200"></label>
-        <label>불투명도 <input type="range" id="modalOpacity" min="0" max="1" step="0.1" value="1"></label>
+      <div class="slider-row">
+        <span class="slider-label">크기</span>
+        <input type="range" id="modalFontSize" min="10" max="200">
+        <span id="modalFontSizeValue" class="slider-value">50</span>
       </div>
-      <div class="row">
-        <label>자간 <input type="range" id="modalLetterSpacing" min="-5" max="20" step="0.5" value="0"></label>
-        <label>회전 <input type="range" id="modalRotation" min="-180" max="180" value="0" step="1"></label>
+      <div class="slider-row">
+        <span class="slider-label">불투명도</span>
+        <input type="range" id="modalOpacity" min="0" max="1" step="0.1" value="1">
+        <span id="modalOpacityValue" class="slider-value">1.0</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">자간</span>
+        <input type="range" id="modalLetterSpacing" min="-5" max="20" step="0.5" value="0">
+        <span id="modalLetterSpacingValue" class="slider-value">0</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">회전</span>
+        <input type="range" id="modalRotation" min="-180" max="180" value="0" step="1">
+        <span id="modalRotationValue" class="slider-value">0°</span>
       </div>
       <div class="row">
         <label>방향
-          <select id="modalTextDirection">
-            <option value="horizontal">가로</option>
-            <option value="vertical">세로</option>
-          </select>
+          <div id="modalDirectionSelector" class="font-selector">
+            <span id="modalDirectionDisplay">가로</span>
+            <input type="hidden" id="modalTextDirection" value="horizontal">
+            <span class="selector-arrow">▼</span>
+          </div>
         </label>
       </div>
       <div class="row">
         <label>정렬 <button id="modalCenterBtn" class="small-button">중앙</button></label>
       </div>
+      
+      <!-- 레이어 순서 조정 -->
+      <div class="row layer-controls">
+        <span class="slider-label">순서</span>
+        <div class="layer-buttons">
+          <button id="modalBringToFrontBtn" class="small-button layer-btn" title="맨앞으로">↑↑</button>
+          <button id="modalBringForwardBtn" class="small-button layer-btn" title="앞으로">↑</button>
+          <button id="modalSendBackwardBtn" class="small-button layer-btn" title="뒤로">↓</button>
+          <button id="modalSendToBackBtn" class="small-button layer-btn" title="맨뒤로">↓↓</button>
+        </div>
+      </div>
+      
       <div class="row">
         <button id="modalDeleteBtn" class="small-button">삭제</button>
         <button id="modalCloseBtn" class="small-button">닫기</button>
@@ -168,7 +286,7 @@
         페이블리 카카오톡채널 바로가기
       </a>
     </div>
-    <p class="copyright">본 페이지는 페이블리ⓒ 에서 제작되었습니다.</p>
+    <p class="copyright">본 페이지는 ⓒ페이블리 에서 제작되었습니다.</p>
   </footer>
 
   <script type="module" src="js/main.js"></script>
