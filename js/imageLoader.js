@@ -17,6 +17,10 @@ export function initImageLoader() {
         const oh = state.img.height;
         state.originalWidth = ow;
         state.originalHeight = oh;
+        
+        // 배경 이미지 상태 업데이트
+        state.backgroundImage = state.img;
+        state.isImageLoaded = true;
 
         const isMobile = window.innerWidth <= 768;
         const wrap = document.querySelector('.canvas-wrapper');

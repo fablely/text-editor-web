@@ -1,23 +1,23 @@
 // js/fontLoader.js
 export const fontFiles = [
-  '강원교육현옥샘.ttf',
   '강원교육모두.ttf',
   '강원교육새음.ttf',
-  '학교안심우산.ttf',
-  '학교안심우주.ttf',
-  '학교안심여행.ttf',
-  '상상토끼꽃길.ttf',
+  '강원교육현옥샘.ttf',
   '더페이스샵.ttf',
   '마포꽃섬.ttf',
   '바른히피.ttf',
-  '빙그레싸만코.ttf',
+  '배달의민족도현체.ttf',
   '배달의민족연성체.ttf',
-  '배달의민족도현.ttf',
   '배달의민족을지로체.ttf',
+  '배달의민족주아체.ttf',
   '배달의민족한나체Air.ttf',
   '배달의민족한나체Pro.ttf',
-  '배달의민족주아체.ttf',
-  '평창평화체.ttf'
+  '빙그레싸만코.ttf',
+  '상상토끼꽃길.ttf',
+  '평창평화체.ttf',
+  '학교안심여행.ttf',
+  '학교안심우산.ttf',
+  '학교안심우주.ttf'
 ];
 
 export let fontsLoadedPromise;
@@ -51,44 +51,69 @@ export function loadFonts() {
       return;
     }
     
-    // 개별 폰트 로딩 제한 시간 설정 (3초)
-    const fontPromises = fontFiles.map(file => {
+    // 개별 폰트 로딩 - 더 안정적인 방법
+    const fontPromises = fontFiles.map((file, index) => {
       const name = file.replace(/\.[^.]+$/, '');
       
-      return Promise.race([
-        new FontFace(name, `url(./Fonts/${encodeURIComponent(file)})`)
-          .load()
-          .then(face => {
-            document.fonts.add(face);
-            loadedFonts.push({ name, face });
-          }),
-        new Promise(resolve => setTimeout(resolve, 3000)) // 개별 폰트 타임아웃
-      ])
-      .catch(() => { 
-        failedCount++; 
-        console.warn(`${name} 폰트 로드 실패`);
-      })
-      .finally(() => {
+      return new Promise((resolveFont) => {
+        // 개별 폰트 타임아웃 (2초로 단축)
+        const timeoutId = setTimeout(() => {
+          failedCount++;
+          console.warn(`${name} 폰트 로드 타임아웃`);
+          resolveFont(null);
+        }, 2000);
+        
+        try {
+          const fontFace = new FontFace(name, `url(./Fonts/${encodeURIComponent(file)})`);
+          
+          // 폰트 로드 전에 파일 존재 여부 간접 확인
+          fontFace.load()
+            .then(face => {
+              clearTimeout(timeoutId);
+              document.fonts.add(face);
+              loadedFonts.push({ name, face });
+              console.log(`✅ ${name} 폰트 로드 성공`);
+              resolveFont(face);
+            })
+            .catch(error => {
+              clearTimeout(timeoutId);
+              failedCount++;
+              console.warn(`${name} 폰트 로드 실패:`, error.message || '파일을 찾을 수 없음');
+              resolveFont(null);
+            });
+            
+        } catch (error) {
+          clearTimeout(timeoutId);
+          failedCount++;
+          console.warn(`${name} 폰트 생성 실패:`, error.message);
+          resolveFont(null);
+        }
+      }).finally(() => {
         loadedCount++;
-        statusDiv.textContent = `폰트 로드: ${loadedCount}개 성공, ${failedCount}개 실패`;
+        const successCount = loadedFonts.length - 1; // 기본 폰트 제외
+        statusDiv.textContent = `폰트 로드: ${successCount}개 성공, ${failedCount}개 실패 (${loadedCount}/${fontFiles.length})`;
         
         // 모든 폰트 로드 시도가 완료되면 선택기 업데이트
-        if (loadedCount + failedCount === fontFiles.length) {
+        if (loadedCount === fontFiles.length) {
           updateFontSelects(loadedFonts, fontFamily, modalFontFamily, statusDiv);
           resolve(loadedFonts);
         }
       });
     });
     
-    // 전체 폰트 로딩 제한 시간 (5초)
+    // 전체 폰트 로딩 제한 시간 (4초로 단축)
     setTimeout(() => {
-      if (loadedCount + failedCount < fontFiles.length) {
-        statusDiv.textContent = `폰트 로드: 일부만 완료됨 (${loadedCount}/${fontFiles.length})`;
+      if (loadedCount < fontFiles.length) {
+        const remainingCount = fontFiles.length - loadedCount;
+        failedCount += remainingCount;
+        loadedCount = fontFiles.length;
+        
+        statusDiv.textContent = `폰트 로드: 타임아웃 (${loadedFonts.length - 1}/${fontFiles.length})`;
         updateFontSelects(loadedFonts, fontFamily, modalFontFamily, statusDiv);
-        console.warn('폰트 로딩 타임아웃 - 일부 폰트만 사용 가능합니다');
+        console.warn(`폰트 로딩 전체 타임아웃 - ${remainingCount}개 폰트 로딩 포기`);
         resolve(loadedFonts);
       }
-    }, 5000);
+    }, 4000);
   });
 
   // 로딩 중에도 기본 폰트를 추가하여 빈 드롭다운이 안 보이도록 함

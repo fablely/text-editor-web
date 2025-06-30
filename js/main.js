@@ -1,12 +1,17 @@
 // js/main.js
 import { initPopup } from './popup.js';
-import { loadFonts, fontsLoadedPromise } from './fontLoader.js';
+import { loadFonts, fontsLoadedPromise, fontFiles } from './fontLoader.js';
 import { initImageLoader } from './imageLoader.js';
 import { initTextControls } from './textControls.js';
 import { initModalControls } from './modalControls.js';
 import { initDragAndDrop } from './dragAndDrop.js';
 import { initSaveAndShare } from './saveAndShare.js';
 import { initFontPicker } from './fontPicker.js';
+import { DirectionPicker } from './directionPicker.js';
+import { stickerLoader } from './stickerLoader.js';
+import { stickerControls } from './stickerControls.js';
+import { modeControls } from './modeControls.js';
+import { initLayerControls } from './layerControls.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   initPopup();
@@ -16,30 +21,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // 상태 표시를 위한 요소 생성
   const statusContainer = document.createElement('div');
-  statusContainer.id = 'editorStatusContainer';
-  statusContainer.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#59b4ad; color:white; padding:10px; border-radius:5px; z-index:1000; opacity:0; transition:opacity 0.3s; pointer-events:none;';
+  statusContainer.id = 'fontLoadStatus';
+  statusContainer.className = 'status-toast';
   document.body.appendChild(statusContainer);
   
   // 상태 메시지 표시 함수
   const showStatus = (message, duration = 2000) => {
-    statusContainer.textContent = message;
-    statusContainer.style.opacity = '1';
+    statusContainer.innerHTML = `<span class="status-icon">✓</span> ${message}`;
+    statusContainer.classList.add('show');
     setTimeout(() => {
-      statusContainer.style.opacity = '0';
+      statusContainer.classList.remove('show');
     }, duration);
   };
   
   // 모든 기본 기능을 폰트 로드와 상관없이 일단 초기화
   // 폰트 로딩 시작
   const fontLoadingPromise = loadFonts();
-  
-  // 폰트 로딩 타임아웃 처리 (10초)
-  const fontLoadingTimeout = new Promise((resolve) => {
-    setTimeout(() => {
-      console.warn('폰트 로드 타임아웃 - 기본 폰트로 진행합니다');
-      resolve([{ name: 'sans-serif', face: null }]);
-    }, 10000);
-  });
   
   // 모든 기본 UI 컴포넌트 먼저 초기화
   initTextControls();
@@ -48,24 +45,40 @@ document.addEventListener('DOMContentLoaded', async () => {
   initSaveAndShare();
   initFontPicker();
   
+  // 방향 선택기 초기화
+  const directionPicker = new DirectionPicker();
+  
+  // 전역 접근을 위해 window 객체에 저장
+  window.directionPicker = directionPicker;
+  
+  // 전역 접근을 위해 다른 객체들도 노출
+  window.state = (await import('./state.js')).state;
+  window.renderCanvas = (await import('./canvasRenderer.js')).renderCanvas;
+  
+  // 새로운 기능 초기화
+  modeControls.init();
+  await stickerLoader.init();
+  stickerControls.init();
+  
+  // 레이어 순서 조정 기능 초기화
+  initLayerControls();
+  
   // 최소 1초 후에 "에디터 사용 가능" 메시지 표시
   setTimeout(() => {
     showStatus('에디터를 사용할 수 있습니다');
   }, 1000);
   
   try {
-    // Promise.race를 사용하여 타임아웃과 폰트 로딩 중 먼저 완료되는 것을 기다림
-    const loadedFonts = await Promise.race([fontLoadingPromise, fontLoadingTimeout]);
+    // fontLoader.js에서 자체 타임아웃 처리하므로 별도 타임아웃 불필요
+    const loadedFonts = await fontLoadingPromise;
     
     if (loadedFonts.length > 1) { // 기본 폰트 외에 다른 폰트도 로드됨
-      showStatus('모든 폰트가 로드되었습니다', 2000);
+      showStatus(`${loadedFonts.length - 1}개 폰트가 로드되었습니다`, 2000);
+      console.log(`폰트 로드 성공: ${loadedFonts.length - 1}/${fontFiles.length}개`);
     } else {
       // 폰트 로딩이 제대로 안된 경우 사용자에게 알림
-      if (navigator.onLine) {
-        console.warn('폰트 로드에 문제가 있습니다. 새로고침을 시도해보세요.');
-      } else {
-        showStatus('오프라인 상태입니다. 기본 폰트만 사용 가능합니다', 3000);
-      }
+      console.warn('폰트 로드 실패 - 기본 폰트만 사용 가능');
+      showStatus('기본 폰트만 사용 가능합니다', 3000);
     }
     
     console.log('에디터 초기화 완료');
