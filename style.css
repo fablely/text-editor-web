@@ -464,12 +464,12 @@ body {
   }
   
   .row {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 6px !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    overflow-x: visible !important;
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow-x: visible;
   }
   
   .canvas-wrapper {
@@ -1302,10 +1302,6 @@ select:disabled, input:disabled {
 }
 
 /* 모바일에서 가로 스크롤 방지 */
-* {
-  box-sizing: border-box;
-}
-
 html, body {
   overflow-x: hidden !important;
   width: 100%;
@@ -1366,20 +1362,20 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
 /* 순서 조정 버튼 레이아웃 - 라벨 오른쪽에 2x2 그리드 배치 */
 .text-control-modal .row.layer-controls,
 .sticker-control-modal .row.layer-controls {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: flex-start !important;
-  gap: 8px !important;
-  margin-bottom: 12px !important;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .text-control-modal .row.layer-controls .layer-buttons,
 .sticker-control-modal .row.layer-controls .layer-buttons {
-  display: grid !important;
-  grid-template-columns: auto auto !important;
-  grid-template-rows: auto auto !important;
-  gap: 4px !important;
-  flex: 1 !important;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  gap: 4px;
+  flex: 1;
 }
 
 /* 다른 row들은 기존대로 가로 배치 */
@@ -1396,27 +1392,27 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
 /* 순서 조정 버튼 스타일 */
 .text-control-modal .layer-buttons .small-button,
 .sticker-control-modal .layer-buttons .small-button {
-  flex-shrink: 0 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  white-space: nowrap !important;
-  padding: 2px 4px !important;
-  font-size: 11px !important;
-  min-width: auto !important;
-  width: auto !important;
-  height: 22px !important;
-  border-radius: 4px !important;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 2px 4px;
+  font-size: 11px;
+  min-width: auto;
+  width: auto;
+  height: 22px;
+  border-radius: 4px;
 }
 
 /* 다른 작은 버튼들은 기존 스타일 유지 */
 .text-control-modal .small-button:not(.layer-buttons .small-button),
 .sticker-control-modal .small-button:not(.layer-buttons .small-button) {
-  flex-shrink: 0 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  white-space: nowrap !important;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }
 
 /* 스티커 컨트롤 모달 슬라이더 행 레이아웃 */
@@ -1457,19 +1453,19 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
 @media (max-width: 768px) {
   /* 캔버스 크기 제한 */
   canvas {
-    max-width: 100% !important;
+    max-width: 100%;
   }
   
   /* 순서 조정 버튼만 작게 */
   .text-control-modal .layer-buttons .small-button,
   .sticker-control-modal .layer-buttons .small-button {
-    padding: 1px 2px !important;
-    font-size: 7px !important;
-    min-width: auto !important;
-    width: auto !important;
-    height: 18px !important;
-    border-radius: 3px !important;
-    margin: 0 !important;
+    padding: 1px 2px;
+    font-size: 7px;
+    min-width: auto;
+    width: auto;
+    height: 18px;
+    border-radius: 3px;
+    margin: 0;
   }
   
   /* 다른 일반 버튼들은 원래 크기 유지 */
@@ -1493,7 +1489,7 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
   /* 모달 너비 조정 */
   .text-control-modal,
   .sticker-control-modal {
-    width: 280px !important;
-    max-width: 90vw !important;
+    width: 280px;
+    max-width: 90vw;
   }
 }
