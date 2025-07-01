@@ -471,7 +471,8 @@ body {
     display: flex;
     flex-direction: row;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: center;
   }
   
   .canvas-wrapper {
@@ -1321,4 +1322,31 @@ input, select, textarea, button, .modal-content, .font-picker-modal, .direction-
 .modal-content, .picker-container, .picker-wheel {
   overscroll-behavior-x: none;
   touch-action: pan-y;
+}
+
+/* 모바일에서 순서 조정 버튼 최적화 */
+@media (max-width: 768px) {
+  .text-control-modal .small-button {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-width: 35px;
+    height: 30px;
+    border-radius: 8px;
+  }
+  
+  .text-control-modal .slider-row {
+    gap: 8px;
+  }
+  
+  .text-control-modal .slider-label {
+    min-width: 50px;
+    font-size: 13px;
+  }
+  
+  /* 순서 조정 버튼들이 한 줄에 유지되도록 */
+  .text-control-modal .row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
