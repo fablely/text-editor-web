@@ -1326,14 +1326,24 @@ input, select, textarea, button, .modal-content, .font-picker-modal, .direction-
 
 /* 모바일에서 순서 조정 버튼 최적화 */
 @media (max-width: 768px) {
-  .text-control-modal .small-button {
-    padding: 4px 8px;
-    font-size: 11px;
-    min-width: 28px;
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+  /* 순서 조정 버튼만 작게 */
+  .text-control-modal .row .small-button {
+    padding: 3px 6px;
+    font-size: 10px;
+    min-width: 24px;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
     flex-shrink: 0;
+  }
+  
+  /* 다른 버튼들은 원래 크기 유지 */
+  .text-control-modal .small-button:not(.row .small-button) {
+    padding: 10px 16px;
+    font-size: 13px;
+    min-width: 70px;
+    height: 36px;
+    border-radius: 12px;
   }
   
   .text-control-modal .slider-row {
@@ -1349,26 +1359,41 @@ input, select, textarea, button, .modal-content, .font-picker-modal, .direction-
   /* 순서 조정 버튼들이 한 줄에 유지되도록 */
   .text-control-modal .row {
     flex-wrap: nowrap !important;
-    gap: 4px;
+    gap: 3px;
     align-items: center;
     justify-content: flex-start;
+    width: 100%;
+    overflow: visible;
   }
   
   /* 모달 자체 너비 조정 */
   .text-control-modal {
-    width: 280px;
-    min-width: 280px;
+    width: 320px;
+    min-width: 320px;
+    max-width: 90vw;
   }
   
   /* 모바일에서 .row 요소의 가로 배치 강제 */
   .row {
     flex-wrap: nowrap !important;
-    gap: 6px;
+    gap: 3px;
     overflow-x: visible;
+    display: flex !important;
+    flex-direction: row !important;
   }
   
   .small-button {
     flex-shrink: 0;
     white-space: nowrap;
+  }
+  
+  /* 순서 버튼 컨테이너 강제 가로 배치 */
+  .text-control-modal .row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
   }
 }
