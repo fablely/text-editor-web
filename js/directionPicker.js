@@ -216,10 +216,15 @@ export class DirectionPicker {
         }
       }
       
-      // 텍스트 방향 변경 이벤트 트리거
+      // 텍스트 방향 변경 이벤트를 수동으로 트리거 (더 확실한 업데이트를 위해)
       const changeEvent = new Event('change', { bubbles: true });
       hiddenInput.dispatchEvent(changeEvent);
       console.log('Direction Picker - Dispatched change event');
+      
+      // InputEvent도 트리거해보기 (일부 리스너가 input 이벤트를 기다릴 수 있음)
+      const inputEvent = new Event('input', { bubbles: true });
+      hiddenInput.dispatchEvent(inputEvent);
+      console.log('Direction Picker - Dispatched input event');
     }
     
     this.hide();

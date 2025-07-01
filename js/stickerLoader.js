@@ -232,10 +232,15 @@ class StickerLoader {
     // 모달 닫기
     this.hideStickerPicker();
     
-    // 스티커 편집 팝업 표시
-    import('./stickerControls.js').then(module => {
-      module.stickerControls.showPopup(stickerObject);
-    });
+    // 화면을 맨 위로 스크롤
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // 스티커 편집 팝업 표시 (약간의 지연 후)
+    setTimeout(() => {
+      import('./stickerControls.js').then(module => {
+        module.stickerControls.showPopup(stickerObject);
+      });
+    }, 500);
     
     console.log('스티커가 추가되었습니다:', stickerObject);
   }

@@ -26,11 +26,14 @@ export function loadFonts() {
   const statusDiv = document.createElement('div');
   statusDiv.id = 'fontLoadStatus';
   statusDiv.style.cssText = 'font-size:12px;color:#666;margin-top:5px;background-color:#f2f2f7;padding:4px 8px;border-radius:4px;text-align:center;';
-  const fontFamily = document.getElementById('fontFamily');
   const modalFontFamily = document.getElementById('modalFontFamily');
   
-  if (fontFamily && fontFamily.parentNode) {
-    fontFamily.parentNode.insertAdjacentElement('afterend', statusDiv);
+  // 모달 폰트 패밀리 근처에 상태 표시
+  if (modalFontFamily && modalFontFamily.parentNode) {
+    modalFontFamily.parentNode.insertAdjacentElement('afterend', statusDiv);
+  } else {
+    // 모달 요소가 없으면 body에 추가
+    document.body.appendChild(statusDiv);
   }
   
   statusDiv.textContent = '폰트 로드 중...';
@@ -46,7 +49,7 @@ export function loadFonts() {
     // 폰트 파일이 없는 경우를 대비
     if (fontFiles.length === 0) {
       console.log('폰트 파일이 없습니다. 기본 폰트만 사용합니다.');
-      updateFontSelects(loadedFonts, fontFamily, modalFontFamily, statusDiv);
+      updateFontSelects(loadedFonts, modalFontFamily, statusDiv);
       resolve(loadedFonts);
       return;
     }
@@ -95,7 +98,7 @@ export function loadFonts() {
         
         // 모든 폰트 로드 시도가 완료되면 선택기 업데이트
         if (loadedCount === fontFiles.length) {
-          updateFontSelects(loadedFonts, fontFamily, modalFontFamily, statusDiv);
+          updateFontSelects(loadedFonts, modalFontFamily, statusDiv);
           resolve(loadedFonts);
         }
       });
@@ -109,7 +112,7 @@ export function loadFonts() {
         loadedCount = fontFiles.length;
         
         statusDiv.textContent = `폰트 로드: 타임아웃 (${loadedFonts.length - 1}/${fontFiles.length})`;
-        updateFontSelects(loadedFonts, fontFamily, modalFontFamily, statusDiv);
+        updateFontSelects(loadedFonts, modalFontFamily, statusDiv);
         console.warn(`폰트 로딩 전체 타임아웃 - ${remainingCount}개 폰트 로딩 포기`);
         resolve(loadedFonts);
       }
@@ -117,33 +120,29 @@ export function loadFonts() {
   });
 
   // 로딩 중에도 기본 폰트를 추가하여 빈 드롭다운이 안 보이도록 함
-  [fontFamily, modalFontFamily].forEach(select => {
-    if (select) {
-      select.innerHTML = '<option value="sans-serif">기본 글꼴</option>';
-    }
-  });
+  if (modalFontFamily) {
+    modalFontFamily.innerHTML = '<option value="sans-serif">기본 글꼴</option>';
+  }
   
   return fontsLoadedPromise;
 }
 
 // 폰트 선택기 업데이트 함수 (중복 코드 제거)
-function updateFontSelects(loadedFonts, fontFamily, modalFontFamily, statusDiv) {
+function updateFontSelects(loadedFonts, modalFontFamily, statusDiv) {
   // 폰트 이름으로 정렬
   loadedFonts.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
   
-  // 선택기 업데이트 (존재하는 경우에만)
-  [fontFamily, modalFontFamily].forEach(select => {
-    if (!select) return;
-    
-    select.innerHTML = ''; // 기존 옵션 제거
+  // 모달 폰트 선택기만 업데이트 (존재하는 경우에만)
+  if (modalFontFamily) {
+    modalFontFamily.innerHTML = ''; // 기존 옵션 제거
     loadedFonts.forEach(f => {
       const opt = document.createElement('option');
       opt.value = f.name;
       opt.textContent = f.name;
       opt.style.fontFamily = f.name;
-      select.append(opt);
+      modalFontFamily.append(opt);
     });
-  });
+  }
   
   // 상태 표시 후 제거
   statusDiv.textContent = `폰트 로드 완료: ${loadedFonts.length - 1}개`;  // 기본 폰트 1개 제외

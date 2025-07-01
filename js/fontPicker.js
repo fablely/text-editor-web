@@ -6,7 +6,27 @@ import { updateModalControls } from './canvasRenderer.js';
 // 전역 변수 선언을 최적화
 let currentFontSelector = null; 
 let selectedFontIndex = 0;
-let fontOptions = [];
+let fontOptions = [
+  { value: 'Inter, sans-serif', text: 'Inter' },
+  { value: '강원교육모두', text: '강원교육모두' },
+  { value: '강원교육새음', text: '강원교육새음' },
+  { value: '강원교육현옥샘', text: '강원교육현옥샘' },
+  { value: '더페이스샵', text: '더페이스샵' },
+  { value: '마포꽃섬', text: '마포꽃섬' },
+  { value: '바른히피', text: '바른히피' },
+  { value: '배달의민족도현체', text: '배달의민족도현체' },
+  { value: '배달의민족연성체', text: '배달의민족연성체' },
+  { value: '배달의민족을지로체', text: '배달의민족을지로체' },
+  { value: '배달의민족주아체', text: '배달의민족주아체' },
+  { value: '배달의민족한나체Air', text: '배달의민족한나체Air' },
+  { value: '배달의민족한나체Pro', text: '배달의민족한나체Pro' },
+  { value: '빙그레싸만코', text: '빙그레싸만코' },
+  { value: '상상토끼꽃길', text: '상상토끼꽃길' },
+  { value: '평창평화체', text: '평창평화체' },
+  { value: '학교안심여행', text: '학교안심여행' },
+  { value: '학교안심우산', text: '학교안심우산' },
+  { value: '학교안심우주', text: '학교안심우주' }
+];
 let fontPickerModal, fontPickerWheel, cancelFontPicker, confirmFontPicker;
 
 // 이벤트 리스너 참조 저장 (메모리 누수 방지)
@@ -31,13 +51,8 @@ export function initFontPicker() {
   const modalFontDisplay = document.getElementById('modalFontDisplay');
   const hiddenModalFontFamily = document.getElementById('modalFontFamily');
 
-  // 폰트 패밀리 선택기
+  // 폰트 패밀리 선택기 - 모달만 사용
   const fontSelectors = [
-    { 
-      selector: document.getElementById('fontFamily'),
-      display: null,
-      type: 'main'
-    },
     {
       selector: hiddenModalFontFamily,
       display: modalFontDisplay,
@@ -45,47 +60,11 @@ export function initFontPicker() {
     }
   ];
 
-  // 이벤트 리스너 설정 - 모바일과 데스크톱 모두 지원
-  const mainFontSelector = document.getElementById('fontFamily');
+  // controls 영역의 fontFamily 요소는 제거되었으므로 모달만 처리
   
-  if (isMobile) {
-    // 모바일: 커스텀 폰트 피커 사용
-    const mainSelectorHandler = function(e) {
-      e.preventDefault();
-      openFontPicker(fontSelectors[0]);
-      return false;
-    };
-    
-    mainFontSelector.addEventListener('click', mainSelectorHandler);
-    mainFontSelector.addEventListener('focus', function(e) {
-      e.preventDefault();
-      this.blur();
-    });
-    
-    mainFontSelector.addEventListener('touchstart', mainSelectorHandler, { passive: false });
-  } else {
-    // 데스크톱: 일반 select change 이벤트 사용
-    mainFontSelector.addEventListener('change', function(e) {
-      console.log('Desktop font change:', e.target.value); // 디버깅 로그
-      if (state.selectedText) {
-        state.selectedText.fontFamily = e.target.value;
-        // 모달 폰트 선택기도 동기화
-        hiddenModalFontFamily.value = e.target.value;
-        if (modalFontDisplay) {
-          const option = Array.from(mainFontSelector.options).find(opt => opt.value === e.target.value);
-          if (option) {
-            modalFontDisplay.textContent = option.textContent;
-            modalFontDisplay.style.fontFamily = e.target.value;
-          }
-        }
-        renderCanvas();
-      }
-    });
-  }
-
   // 모달 폰트 선택기 이벤트 설정
   modalFontSelector.addEventListener('click', function() {
-    openFontPicker(fontSelectors[1]);
+    openFontPicker(fontSelectors[0]);
   });
 
   // 이벤트 리스너 중앙 관리 (중복 등록 방지)
@@ -130,6 +109,11 @@ export function initFontPicker() {
   };
   
   fontPickerWheel.addEventListener('click', eventListeners.fontPickerWheel);
+  // 터치 선택 지원
+  fontPickerWheel.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    eventListeners.fontPickerWheel(e);
+  }, { passive: false });
 
   // 디바운스 최적화된 스크롤 이벤트
   fontPickerWheel.addEventListener('scroll', debounce(updateSelectedFont, 50));
@@ -186,15 +170,6 @@ function openFontPicker(selectorObj) {
   
   const selector = selectorObj.selector;
   
-  // 폰트 옵션 가져오기 (메인 폰트 선택기에서 옵션 가져옴)
-  const mainSelector = document.getElementById('fontFamily');
-  fontOptions = Array.from(mainSelector.options).map(option => {
-    return {
-      value: option.value,
-      text: option.textContent
-    };
-  });
-
   // 현재 선택된 값 찾기
   selectedFontIndex = fontOptions.findIndex(option => option.value === selector.value);
   if (selectedFontIndex === -1) selectedFontIndex = 0;
@@ -270,16 +245,12 @@ function previewFontSelection() {
     // 새 폰트로 임시 변경
     state.selectedText.fontFamily = fontOptions[selectedFontIndex].value;
     
-    // 두 폰트 선택기 동기화
-    if (currentFontSelector.type === 'modal') {
-      document.getElementById('fontFamily').value = fontOptions[selectedFontIndex].value;
-    } else {
-      document.getElementById('modalFontFamily').value = fontOptions[selectedFontIndex].value;
-      const modalFontDisplay = document.getElementById('modalFontDisplay');
-      if (modalFontDisplay) {
-        modalFontDisplay.textContent = fontOptions[selectedFontIndex].text;
-        modalFontDisplay.style.fontFamily = fontOptions[selectedFontIndex].value;
-      }
+    // 모달 폰트 선택기 동기화
+    document.getElementById('modalFontFamily').value = fontOptions[selectedFontIndex].value;
+    const modalFontDisplay = document.getElementById('modalFontDisplay');
+    if (modalFontDisplay) {
+      modalFontDisplay.textContent = fontOptions[selectedFontIndex].text;
+      modalFontDisplay.style.fontFamily = fontOptions[selectedFontIndex].value;
     }
     
     // 캔버스 다시 그리기
@@ -311,14 +282,10 @@ function applyFontSelection() {
   if (state.selectedText) {
     state.selectedText.fontFamily = fontOptions[selectedFontIndex].value;
     
-    // 두 폰트 선택기 동기화
-    if (type === 'modal') {
-      document.getElementById('fontFamily').value = fontOptions[selectedFontIndex].value;
-    } else {
-      document.getElementById('modalFontFamily').value = fontOptions[selectedFontIndex].value;
-      document.getElementById('modalFontDisplay').textContent = fontOptions[selectedFontIndex].text;
-      document.getElementById('modalFontDisplay').style.fontFamily = fontOptions[selectedFontIndex].value;
-    }
+    // 모달 폰트 선택기 동기화
+    document.getElementById('modalFontFamily').value = fontOptions[selectedFontIndex].value;
+    document.getElementById('modalFontDisplay').textContent = fontOptions[selectedFontIndex].text;
+    document.getElementById('modalFontDisplay').style.fontFamily = fontOptions[selectedFontIndex].value;
     
     // 캔버스 다시 그리기
     renderCanvas();
@@ -341,11 +308,10 @@ function updateFontDisplay() {
 
   if (modalFontFamily && modalFontDisplay) {
     const fontValue = modalFontFamily.value;
-    const mainSelector = document.getElementById('fontFamily');
-    const option = Array.from(mainSelector.options).find(opt => opt.value === fontValue);
+    const option = fontOptions.find(opt => opt.value === fontValue);
     
     if (option) {
-      modalFontDisplay.textContent = option.textContent;
+      modalFontDisplay.textContent = option.text;
       modalFontDisplay.style.fontFamily = option.value;
     } else {
       modalFontDisplay.textContent = '기본 글꼴';

@@ -308,12 +308,8 @@ export function updateModalControls(textObj) {
   // 모달 폰트 디스플레이 업데이트
   const modalFontDisplay = document.getElementById('modalFontDisplay');
   if (modalFontDisplay) {
-    const fontFamily = document.getElementById('fontFamily');
-    const option = Array.from(fontFamily.options).find(opt => opt.value === textObj.fontFamily);
-    if (option) {
-      modalFontDisplay.textContent = option.textContent;
-      modalFontDisplay.style.fontFamily = option.value;
-    }
+    modalFontDisplay.textContent = textObj.fontFamily;
+    modalFontDisplay.style.fontFamily = textObj.fontFamily;
   }
   
   document.getElementById('modalFontColor').value = textObj.color;
@@ -332,18 +328,6 @@ export function updateModalControls(textObj) {
     direction: textObj.direction,
     modalDirectionValue: document.getElementById('modalTextDirection').value
   });
-  
-  // 방향 디스플레이 업데이트
-  const directionDisplay = document.getElementById('modalDirectionDisplay');
-  if (directionDisplay) {
-    directionDisplay.textContent = (textObj.direction || 'horizontal') === 'horizontal' ? '가로' : '세로';
-    console.log('Canvas Renderer - Direction display updated to:', directionDisplay.textContent);
-  }
-  
-  // DirectionPicker 상태도 업데이트
-  if (window.directionPicker) {
-    window.directionPicker.setSelectedDirection(textObj.direction || 'horizontal');
-  }
 }
 
 // 위치에서 텍스트 찾기 (z-index 순서 고려)

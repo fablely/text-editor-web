@@ -66,11 +66,11 @@ export function initModalControls() {
     });
   });
 
-  // 방향 변경을 위한 별도 이벤트 리스너 (백업용)
+  // 방향 변경을 위한 이벤트 리스너
   const modalDirectionInput = document.getElementById('modalTextDirection');
   if (modalDirectionInput) {
     modalDirectionInput.addEventListener('change', (e) => {
-      console.log('Modal Controls - Backup direction change listener triggered:', e.target.value);
+      console.log('Modal Controls - Direction change listener triggered:', e.target.value);
       
       // state.selectedText가 없을 때는 전역에서 찾아보기
       let targetText = state.selectedText;
@@ -93,18 +93,43 @@ export function initModalControls() {
 
   // 특수 버튼 이벤트 처리
   document.getElementById('modalCenterBtn').addEventListener('click', () => {
-    const centerBtn = document.getElementById('centerTextBtn');
-    if (centerBtn) {
-      centerBtn.click();
-      if (state.selectedText) positionModalNearText(state.selectedText);
+    const t = state.selectedText;
+    if (t) {
+      // 텍스트 너비 계산
+      const { ctx } = state;
+      ctx.save();
+      ctx.font = `${t.size}px "${t.fontFamily}"`;
+      const spacing = t.letterSpacing || 0;
+      let textWidth;
+      if (t.direction === 'vertical') {
+        textWidth = t.size;
+      } else if (spacing) {
+        textWidth = t.text.split('').reduce((sum, ch) => sum + ctx.measureText(ch).width + spacing, 0) - spacing;
+      } else {
+        textWidth = ctx.measureText(t.text).width;
+      }
+      ctx.restore();
+
+      // 중앙 정렬 (텍스트 너비 고려)
+      t.x = Math.round(state.canvasWidth / 2 - textWidth / 2);
+      renderCanvas();
+      positionModalNearText(t);
     }
   });
 
   document.getElementById('modalDeleteBtn').addEventListener('click', () => {
-    const deleteBtn = document.getElementById('deleteTextBtn');
-    if (deleteBtn) {
-      deleteBtn.click();
+    if (state.selectedElement) {
+      if (state.selectedElementType === 'text') {
+        state.textObjects = state.textObjects.filter(t => t !== state.selectedElement);
+        state.selectedText = null;
+      } else if (state.selectedElementType === 'sticker') {
+        state.stickers = state.stickers.filter(s => s !== state.selectedElement);
+      }
+      
+      state.selectedElement = null;
+      state.selectedElementType = null;
       modal.classList.add('hidden');
+      renderCanvas();
     }
   });
 

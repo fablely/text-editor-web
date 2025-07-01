@@ -7,7 +7,6 @@ import { initModalControls } from './modalControls.js';
 import { initDragAndDrop } from './dragAndDrop.js';
 import { initSaveAndShare } from './saveAndShare.js';
 import { initFontPicker } from './fontPicker.js';
-import { DirectionPicker } from './directionPicker.js';
 import { stickerLoader } from './stickerLoader.js';
 import { stickerControls } from './stickerControls.js';
 import { modeControls } from './modeControls.js';
@@ -44,12 +43,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initDragAndDrop();
   initSaveAndShare();
   initFontPicker();
-  
-  // 방향 선택기 초기화
-  const directionPicker = new DirectionPicker();
-  
-  // 전역 접근을 위해 window 객체에 저장
-  window.directionPicker = directionPicker;
   
   // 전역 접근을 위해 다른 객체들도 노출
   window.state = (await import('./state.js')).state;

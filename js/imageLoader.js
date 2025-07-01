@@ -22,20 +22,13 @@ export function initImageLoader() {
         state.backgroundImage = state.img;
         state.isImageLoaded = true;
 
-        const isMobile = window.innerWidth <= 768;
-        const wrap = document.querySelector('.canvas-wrapper');
-        const maxWidth = isMobile ? window.innerWidth * 0.95 : wrap.clientWidth;
-        const maxHeight = window.innerHeight * (isMobile ? 0.8 : 0.7);
+        // 캔버스 Wrapper 보이게 하고 너비 기준으로 가로폭 꽉 채우기
+        const wrap = document.querySelector('.canvas-wrapper') || document.body;
+        wrap.classList.add('image-loaded');
+        const wrapWidth = wrap.clientWidth;
         const aspectRatio = ow / oh;
-
-        let displayWidth, displayHeight;
-        if (aspectRatio > maxWidth / maxHeight) {
-          displayWidth = maxWidth;
-          displayHeight = displayWidth / aspectRatio;
-        } else {
-          displayHeight = maxHeight;
-          displayWidth = displayHeight * aspectRatio;
-        }
+        const displayWidth = wrapWidth;
+        const displayHeight = displayWidth / aspectRatio;
 
         const dpr = state.canvasScale;
         state.canvas.style.width = `${displayWidth}px`;
@@ -54,6 +47,8 @@ export function initImageLoader() {
         
         state.ctx.imageSmoothingEnabled = true;
         state.ctx.imageSmoothingQuality = 'high';
+
+        // 캔버스 래퍼는 이미 표시됨
 
         renderCanvas();
         console.log(`이미지 로드됨: 원본 크기=${ow}x${oh}, 표시 크기=${displayWidth}x${displayHeight}, 비율=${state.scaleRatioX}x${state.scaleRatioY}`);

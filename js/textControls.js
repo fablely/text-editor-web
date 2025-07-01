@@ -25,22 +25,6 @@ function getNextZIndex() {
 
 export function initTextControls() {
   const txtInput = document.getElementById('textInput');
-  const fontFamily = document.getElementById('fontFamily');
-  const fontSize = document.getElementById('fontSize');
-  const fontColor = document.getElementById('fontColor');
-  const opacity = document.getElementById('opacity');
-  const rotation = document.getElementById('rotation');
-  const textDirection = document.getElementById('textDirection');
-  const letterSpacing = document.getElementById('letterSpacing');
-
-  // 폼 컨트롤이 준비되었는지 확인
-  if (fontFamily.options.length === 0) {
-    console.warn('폰트 목록이 아직 로드되지 않았습니다. 기본 글꼴을 추가합니다.');
-    const opt = document.createElement('option');
-    opt.value = 'sans-serif';
-    opt.textContent = '기본 글꼴';
-    fontFamily.appendChild(opt);
-  }
 
   document.getElementById('addTextBtn').addEventListener('click', () => {
     if (!txtInput.value.trim()) {
@@ -54,21 +38,18 @@ export function initTextControls() {
       imageRequiredPopup.classList.remove('hidden');
       return;
     }
-
-    // 선택된 폰트 확인 및 기본값 설정
-    const selectedFont = fontFamily.value || 'sans-serif';
     
     const newText = {
       text: txtInput.value,
       x: 50,
       y: 80,
-      fontFamily: selectedFont,
-      size: parseInt(fontSize.value, 10) || 36,
-      color: fontColor.value || '#ffffff',
-      opacity: parseFloat(opacity.value) || 1,
-      rotation: parseFloat(rotation.value) || 0,
-      direction: textDirection.value || 'horizontal',
-      letterSpacing: parseFloat(letterSpacing.value) || 0,
+      fontFamily: 'sans-serif', // 기본 글꼴
+      size: 36, // 기본 크기
+      color: '#ffffff', // 기본 색상
+      opacity: 1, // 기본 불투명도
+      rotation: 0, // 기본 회전
+      direction: 'horizontal', // 기본 방향
+      letterSpacing: 0, // 기본 자간
       zIndex: getNextZIndex() // 새로운 z-index 할당
     };
     
@@ -78,6 +59,9 @@ export function initTextControls() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
       state.selectedText = newText;
+      // 첫 모달 오픈 시 삭제 버튼 동작을 위해 선택 요소 설정
+      state.selectedElement = newText;
+      state.selectedElementType = 'text';
       updateModalControls(newText);
       positionModalNearText(newText);      
       document.getElementById('textControlModal').classList.remove('hidden');
@@ -85,69 +69,10 @@ export function initTextControls() {
     }, 500);
   });
 
-  // 텍스트 입력 이벤트
+  // 텍스트 입력 이벤트 (모달에서만 사용)
   txtInput.addEventListener('input', () => {
     if (!state.selectedText) return;
     state.selectedText.text = txtInput.value;
-    renderCanvas();
-  });
-
-  // 폰트 패밀리 변경 이벤트 (select 요소는 change 이벤트 사용)
-  fontFamily.addEventListener('change', () => {
-    if (!state.selectedText) return;
-    state.selectedText.fontFamily = fontFamily.value;
-    console.log('Font changed to:', fontFamily.value); // 디버깅 로그
-    renderCanvas();
-  });
-
-  // 나머지 컨트롤 이벤트 (input 이벤트 사용)
-  [fontSize, fontColor, opacity, rotation, letterSpacing].forEach(input => {
-    input.addEventListener('input', () => {
-      if (!state.selectedText) return;
-      Object.assign(state.selectedText, {
-        size: parseInt(fontSize.value, 10),
-        color: fontColor.value,
-        opacity: parseFloat(opacity.value),
-        rotation: parseFloat(rotation.value),
-        letterSpacing: parseFloat(letterSpacing.value)
-      });
-      renderCanvas();
-    });
-  });
-
-  // 텍스트 방향 변경 이벤트 (select 요소는 change 이벤트 사용)
-  textDirection.addEventListener('change', () => {
-    if (!state.selectedText) return;
-    state.selectedText.direction = textDirection.value;
-    renderCanvas();
-  });
-
-  document.getElementById('deleteTextBtn').addEventListener('click', () => {
-    if (state.selectedElement) {
-      if (state.selectedElementType === 'text') {
-        state.textObjects = state.textObjects.filter(t => t !== state.selectedElement);
-        state.selectedText = null;
-      } else if (state.selectedElementType === 'sticker') {
-        state.stickers = state.stickers.filter(s => s !== state.selectedElement);
-      }
-      
-      state.selectedElement = null;
-      state.selectedElementType = null;
-      document.getElementById('textControlModal').classList.add('hidden');
-      renderCanvas();
-    }
-  });
-
-  document.getElementById('centerTextBtn').addEventListener('click', () => {
-    if (!state.selectedText) return;
-    const canvasCenterX = (state.canvas.width / state.canvasScale) / 2;
-    state.ctx.font = `${state.selectedText.size}px "${state.selectedText.fontFamily}"`;
-
-    let textWidth = state.selectedText.direction === 'vertical'
-      ? state.selectedText.size
-      : state.ctx.measureText(state.selectedText.text).width + (state.selectedText.letterSpacing || 0) * (state.selectedText.text.length - 1);
-
-    state.selectedText.x = canvasCenterX - textWidth / 2;
     renderCanvas();
   });
 
