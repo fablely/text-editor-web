@@ -1327,26 +1327,48 @@ input, select, textarea, button, .modal-content, .font-picker-modal, .direction-
 /* 모바일에서 순서 조정 버튼 최적화 */
 @media (max-width: 768px) {
   .text-control-modal .small-button {
-    padding: 6px 10px;
-    font-size: 12px;
-    min-width: 35px;
-    height: 30px;
-    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 11px;
+    min-width: 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    flex-shrink: 0;
   }
   
   .text-control-modal .slider-row {
-    gap: 8px;
+    gap: 6px;
   }
   
   .text-control-modal .slider-label {
-    min-width: 50px;
-    font-size: 13px;
+    min-width: 45px;
+    font-size: 12px;
+    flex-shrink: 0;
   }
   
   /* 순서 조정 버튼들이 한 줄에 유지되도록 */
   .text-control-modal .row {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+    gap: 4px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  
+  /* 모달 자체 너비 조정 */
+  .text-control-modal {
+    width: 280px;
+    min-width: 280px;
+  }
+  
+  /* 모바일에서 .row 요소의 가로 배치 강제 */
+  .row {
+    flex-wrap: nowrap !important;
+    gap: 6px;
+    overflow-x: visible;
+  }
+  
+  .small-button {
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 }
