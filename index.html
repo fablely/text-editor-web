@@ -55,21 +55,6 @@
     </div>
   </div>
 
-  <!-- 방향 선택 모달 -->
-  <div id="directionPickerModal" class="font-picker-modal hidden">
-    <div class="picker-header">
-      <button id="cancelDirectionPicker" class="picker-button">취소</button>
-      <h3>방향 선택</h3>
-      <button id="confirmDirectionPicker" class="picker-button">확인</button>
-    </div>
-    <div class="picker-container">
-      <div class="picker-wheel" id="directionPickerWheel">
-        <div class="direction-option" data-value="horizontal">가로</div>
-        <div class="direction-option" data-value="vertical">세로</div>
-      </div>
-    </div>
-  </div>
-
   <!-- 스티커 선택 모달 -->
   <div id="stickerPickerModal" class="popup-overlay hidden">
     <div class="popup-content sticker-picker-content">
@@ -107,10 +92,10 @@
       <div class="row layer-controls">
         <span class="slider-label">순서</span>
         <div class="layer-buttons">
-          <button id="stickerBringToFrontBtn" class="small-button layer-btn" title="맨앞으로">↑↑</button>
-          <button id="stickerBringForwardBtn" class="small-button layer-btn" title="앞으로">↑</button>
-          <button id="stickerSendBackwardBtn" class="small-button layer-btn" title="뒤로">↓</button>
-          <button id="stickerSendToBackBtn" class="small-button layer-btn" title="맨뒤로">↓↓</button>
+          <button id="stickerBringToFrontBtn" class="small-button layer-btn" title="맨앞으로">맨앞으로</button>
+          <button id="stickerBringForwardBtn" class="small-button layer-btn" title="앞으로">앞으로</button>
+          <button id="stickerSendBackwardBtn" class="small-button layer-btn" title="뒤로">뒤로</button>
+          <button id="stickerSendToBackBtn" class="small-button layer-btn" title="맨뒤로">맨뒤로</button>
         </div>
       </div>
       
@@ -144,7 +129,9 @@
       <input type="file" id="imageLoader" accept="image/*">
     </label>
     
-    <div class="canvas-wrapper">
+    <div class="canvas-wrapper" style="padding-top:56.25%;">
+      <!-- 이미지 미선택 시 안내 문구 -->
+      <div class="canvas-placeholder">이미지를 우선<br>선택해 주세요</div>
       <canvas id="canvas"></canvas>
     </div>
     
@@ -166,40 +153,6 @@
         <p style="text-align: center; color: #666; margin: 1px 0;">스티커를 추가하려면 위의 '스티커 추가' 버튼을 클릭하세요</p>
       </div>
 
-      <div class="row">
-        <label>글꼴
-          <select id="fontFamily">
-          </select>
-        </label>
-
-        <label>크기
-          <input type="range" id="fontSize" min="10" max="200" value="36">
-        </label>
-      </div>
-
-      <div class="row">
-        <label>색상 <input type="color" id="fontColor" value="#ffffff"></label>
-        <label>불투명도 <input type="range" id="opacity" min="0" max="1" step="0.1" value="1"></label>
-      </div>
-      
-      <div class="row">
-        <label>자간 <input type="range" id="letterSpacing" min="-5" max="20" step="0.5" value="0"></label>
-      </div>
-
-      <div class="row">
-        <label>회전 <input type="range" id="rotation" min="-180" max="180" value="0" step="1"> °</label>
-        <label>방향
-          <select id="textDirection">
-            <option value="horizontal">가로</option>
-            <option value="vertical">세로</option>
-          </select>
-        </label>
-        <label>정렬
-          <button id="centerTextBtn" class="small-button">중앙</button>
-        </label>
-      </div>
-
-      <button id="deleteTextBtn">선택된 텍스트 삭제</button>
       <button id="saveImageBtn">이미지 저장</button>
       <button id="shareImageBtn">이미지 공유</button>
     </div>
@@ -245,11 +198,10 @@
       </div>
       <div class="row">
         <label>방향
-          <div id="modalDirectionSelector" class="font-selector">
-            <span id="modalDirectionDisplay">가로</span>
-            <input type="hidden" id="modalTextDirection" value="horizontal">
-            <span class="selector-arrow">▼</span>
-          </div>
+          <select id="modalTextDirection">
+            <option value="horizontal">가로</option>
+            <option value="vertical">세로</option>
+          </select>
         </label>
       </div>
       <div class="row">
@@ -260,10 +212,10 @@
       <div class="row layer-controls">
         <span class="slider-label">순서</span>
         <div class="layer-buttons">
-          <button id="modalBringToFrontBtn" class="small-button layer-btn" title="맨앞으로">↑↑</button>
-          <button id="modalBringForwardBtn" class="small-button layer-btn" title="앞으로">↑</button>
-          <button id="modalSendBackwardBtn" class="small-button layer-btn" title="뒤로">↓</button>
-          <button id="modalSendToBackBtn" class="small-button layer-btn" title="맨뒤로">↓↓</button>
+          <button id="modalBringToFrontBtn" class="small-button layer-btn" title="맨앞으로">맨앞으로</button>
+          <button id="modalBringForwardBtn" class="small-button layer-btn" title="앞으로">앞으로</button>
+          <button id="modalSendBackwardBtn" class="small-button layer-btn" title="뒤로">뒤로</button>
+          <button id="modalSendToBackBtn" class="small-button layer-btn" title="맨뒤로">맨뒤로</button>
         </div>
       </div>
       

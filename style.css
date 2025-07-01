@@ -342,11 +342,7 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
   
-  /* 회전 입력 필드 크기 제한 */
-  #rotation {
-    max-width: 60px;
-    flex: none; /* flex: 1 대신 flex: none을 사용하여 늘어나지 않도록 설정 */
-  }
+
   
   /* 업로드 버튼 */
   .upload-button {
@@ -468,38 +464,54 @@ body {
   }
   
   .row {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    flex-wrap: nowrap;
-    align-items: center;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    overflow-x: visible !important;
   }
   
   .canvas-wrapper {
+    background: rgba(255, 255, 255, 0.1); /* placeholder 대비 배경 */
     width: 100%;
     margin-bottom: 24px;
     position: relative;
-    display: flex;
+    display: flex; /* 항상 표시, 내부에서 canvas/placeholder 제어 */
     justify-content: center;
     align-items: center;
+    overflow: hidden;
+  }
+
+  /* 캔버스 영역 이미지 선택 전 안내 문구 스타일 */
+  .canvas-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 18px;
+    pointer-events: none;
+    text-align: center;
+    z-index: 1;
   }
   
-  .canvas-wrapper::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    right: -8px;
-    bottom: -8px;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
-    border-radius: 24px;
-    z-index: -1;
-    filter: blur(8px);
+  .canvas-wrapper.image-loaded {
+    display: flex;
+    padding-top: 0 !important; /* 이미지 로드시 상단 패딩 제거 */
+    aspect-ratio: auto !important; /* 로드 후 종횡비 적용 해제 */
+  }
+  
+  .canvas-wrapper.image-loaded .canvas-placeholder {
+    display: none;
+  }
+  
+  /* 이미지가 로드된 후 캔버스 표시 */
+  .canvas-wrapper.image-loaded canvas {
+    display: block;
   }
   
   canvas {
-    width: 100%;
-    max-width: 100%;
     border-radius: 0;
     background-color: #fff;
     border: 3px solid rgba(255, 255, 255, 0.8);
@@ -510,7 +522,7 @@ body {
       0 8px 32px rgba(0, 0, 0, 0.15),
       0 0 0 1px rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
-    display: block;
+    display: none; /* 기본적으로 숨김, 이미지 로드시 표시 */
     margin: 0 auto;
   }
   
@@ -753,11 +765,31 @@ body {
   
   /* 모달 내 입력 필드 스타일 */
   .text-control-modal input[type="text"],
-  .text-control-modal input[type="color"],
-  .text-control-modal select {
+  .text-control-modal input[type="color"] {
     color: #374151;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 모달 내 방향 드롭다운을 중앙 버튼과 같은 크기로 조정 */
+  .text-control-modal select {
+    color: #374151 !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    min-width: 60px !important;
+    height: 36px !important;
+    border-radius: 12px !important;
+    flex-shrink: 0 !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .text-control-modal select:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
   }
   
   .text-control-modal input[type="text"]:focus,
@@ -771,14 +803,14 @@ body {
     display: flex;
     align-items: center;
     margin-bottom: 12px;
-    gap: 10px;
+    gap: 8px;
     padding: 4px 0;
   }
   
   .text-control-modal .slider-label {
     font-size: 14px;
     font-weight: 600;
-    min-width: 60px;
+    min-width: 50px;
     flex-shrink: 0;
     color: #374151;
   }
@@ -801,10 +833,10 @@ body {
   }
   
   .text-control-modal .small-button {
-    padding: 10px 16px;
-    font-size: 13px;
+    padding: 8px 12px;
+    font-size: 12px;
     font-weight: 600;
-    min-width: 70px;
+    min-width: 60px;
     border-radius: 12px;
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.8);
@@ -899,6 +931,7 @@ body {
   /* 푸터 버튼 스타일 */
   .footer-button {
     display: flex;
+    white-space: nowrap;
     align-items: center;
     justify-content: center;
     gap: 12px;
@@ -1199,6 +1232,12 @@ select:disabled, input:disabled {
   display: none; /* 완전히 숨김 */
 }
 
+/* 상하 마스크가 터치/클릭을 막기 않도록 pointer-events 해제 */
+.picker-container:before,
+.picker-container:after {
+  pointer-events: none;
+}
+
 .font-option {
   height: 40px;
   display: flex;
@@ -1312,7 +1351,7 @@ html, body {
 }
 
 /* 모든 인터랙티브 요소의 가로 스크롤 차단 */
-input, select, textarea, button, .modal-content, .font-picker-modal, .direction-picker-modal {
+input, select, textarea, button, .modal-content, .font-picker-modal {
   max-width: 100%;
   overflow-x: hidden;
   touch-action: manipulation;
@@ -1324,76 +1363,137 @@ input, select, textarea, button, .modal-content, .font-picker-modal, .direction-
   touch-action: pan-y;
 }
 
+/* 순서 조정 버튼 레이아웃 - 라벨 오른쪽에 2x2 그리드 배치 */
+.text-control-modal .row.layer-controls,
+.sticker-control-modal .row.layer-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  margin-bottom: 12px !important;
+}
+
+.text-control-modal .row.layer-controls .layer-buttons,
+.sticker-control-modal .row.layer-controls .layer-buttons {
+  display: grid !important;
+  grid-template-columns: auto auto !important;
+  grid-template-rows: auto auto !important;
+  gap: 4px !important;
+  flex: 1 !important;
+}
+
+/* 다른 row들은 기존대로 가로 배치 */
+.text-control-modal .row:not(.layer-controls),
+.sticker-control-modal .row:not(.layer-controls) {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 12px !important;
+}
+
+/* 순서 조정 버튼 스타일 */
+.text-control-modal .layer-buttons .small-button,
+.sticker-control-modal .layer-buttons .small-button {
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  padding: 2px 4px !important;
+  font-size: 11px !important;
+  min-width: auto !important;
+  width: auto !important;
+  height: 22px !important;
+  border-radius: 4px !important;
+}
+
+/* 다른 작은 버튼들은 기존 스타일 유지 */
+.text-control-modal .small-button:not(.layer-buttons .small-button),
+.sticker-control-modal .small-button:not(.layer-buttons .small-button) {
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+}
+
+/* 스티커 컨트롤 모달 슬라이더 행 레이아웃 */
+.sticker-control-modal .slider-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.sticker-control-modal .slider-label {
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 50px;
+  flex-shrink: 0;
+  color: #374151;
+}
+
+.sticker-control-modal .slider-row input[type="range"] {
+  flex: 1;
+  margin: 0;
+}
+
+.sticker-control-modal .slider-value {
+  font-size: 13px;
+  min-width: 45px;
+  text-align: center;
+  font-weight: 600;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
 /* 모바일에서 순서 조정 버튼 최적화 */
 @media (max-width: 768px) {
+  /* 캔버스 크기 제한 */
+  canvas {
+    max-width: 100% !important;
+  }
+  
   /* 순서 조정 버튼만 작게 */
-  .text-control-modal .row .small-button {
-    padding: 3px 6px;
-    font-size: 10px;
-    min-width: 24px;
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    flex-shrink: 0;
+  .text-control-modal .layer-buttons .small-button,
+  .sticker-control-modal .layer-buttons .small-button {
+    padding: 1px 2px !important;
+    font-size: 7px !important;
+    min-width: auto !important;
+    width: auto !important;
+    height: 18px !important;
+    border-radius: 3px !important;
+    margin: 0 !important;
   }
   
-  /* 다른 버튼들은 원래 크기 유지 */
-  .text-control-modal .small-button:not(.row .small-button) {
-    padding: 10px 16px;
-    font-size: 13px;
-    min-width: 70px;
-    height: 36px;
-    border-radius: 12px;
+  /* 다른 일반 버튼들은 원래 크기 유지 */
+  .text-control-modal .small-button:not(.row .small-button),
+  .sticker-control-modal .small-button:not(.row .small-button) {
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+    min-width: 70px !important;
+    height: 36px !important;
+    border-radius: 12px !important;
   }
   
-  .text-control-modal .slider-row {
-    gap: 6px;
+  /* 순서 버튼이 있는 행의 라벨 조정 */
+  .text-control-modal .slider-row .slider-label,
+  .sticker-control-modal .slider-row .slider-label {
+    min-width: 50px !important;
+    font-size: 12px !important;
+    flex-shrink: 0 !important;
   }
   
-  .text-control-modal .slider-label {
-    min-width: 45px;
-    font-size: 12px;
-    flex-shrink: 0;
-  }
-  
-  /* 순서 조정 버튼들이 한 줄에 유지되도록 */
-  .text-control-modal .row {
-    flex-wrap: nowrap !important;
-    gap: 3px;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    overflow: visible;
-  }
-  
-  /* 모달 자체 너비 조정 */
-  .text-control-modal {
-    width: 320px;
-    min-width: 320px;
-    max-width: 90vw;
-  }
-  
-  /* 모바일에서 .row 요소의 가로 배치 강제 */
-  .row {
-    flex-wrap: nowrap !important;
-    gap: 3px;
-    overflow-x: visible;
-    display: flex !important;
-    flex-direction: row !important;
-  }
-  
-  .small-button {
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-  
-  /* 순서 버튼 컨테이너 강제 가로 배치 */
-  .text-control-modal .row {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
+  /* 모달 너비 조정 */
+  .text-control-modal,
+  .sticker-control-modal {
+    width: 280px !important;
+    max-width: 90vw !important;
   }
 }
