@@ -104,19 +104,22 @@ export function initFontPicker() {
       
       // 스크롤 위치 조정 - 메모리 최적화 위해 여기서만 직접 계산
       const optionHeight = 40;
-      fontPickerWheel.scrollTop = selectedFontIndex * optionHeight;
+      const desiredScroll = selectedFontIndex * optionHeight;
+      const maxScroll = fontPickerWheel.scrollHeight - fontPickerWheel.clientHeight;
+      fontPickerWheel.scrollTop = Math.min(desiredScroll, maxScroll);
     }
   };
   
   fontPickerWheel.addEventListener('click', eventListeners.fontPickerWheel);
-  // 터치 선택 지원
-  fontPickerWheel.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    eventListeners.fontPickerWheel(e);
-  }, { passive: false });
+  // 터치 선택 지원 (tap 시 선택, 스크롤은 유지)
+  fontPickerWheel.addEventListener('touchend', function(e) {
+    if (e.target.classList.contains('font-option')) {
+      eventListeners.fontPickerWheel(e);
+    }
+  }, { passive: true });
 
-  // 디바운스 최적화된 스크롤 이벤트
-  fontPickerWheel.addEventListener('scroll', debounce(updateSelectedFont, 50));
+  // 디바운스 최적화된 스크롤 이벤트 (passive listener for smooth scrolling)
+  fontPickerWheel.addEventListener('scroll', debounce(updateSelectedFont, 50), { passive: true });
 
   // 마우스 휠 이벤트를 직접 처리하여 더 정밀한 제어
   fontPickerWheel.addEventListener('wheel', function(e) {
@@ -196,7 +199,9 @@ function openFontPicker(selectorObj) {
   // 현재 선택된 폰트로 스크롤
   setTimeout(() => {
     const optionHeight = 40; // font-option의 높이
-    fontPickerWheel.scrollTop = selectedFontIndex * optionHeight;
+    const desired = selectedFontIndex * optionHeight;
+    const maxScroll = fontPickerWheel.scrollHeight - fontPickerWheel.clientHeight;
+    fontPickerWheel.scrollTop = Math.min(desired, maxScroll);
   }, 50);
 }
 
@@ -206,10 +211,16 @@ function updateSelectedFont() {
   const options = fontPickerWheel.querySelectorAll('.font-option');
   const optionHeight = 40; // font-option의 높이
   const scrollTop = fontPickerWheel.scrollTop;
+  const maxScroll = fontPickerWheel.scrollHeight - fontPickerWheel.clientHeight;
   
   // 스크롤 위치에 따라 중앙에 있는 옵션 찾기 (정확한 위치 계산)
   // 가이드라인과 정확히 일치하도록 계산 (80px 패딩 고려)
-  const centerIndex = Math.floor((scrollTop + optionHeight / 2) / optionHeight);
+  let centerIndex;
+  if (scrollTop >= maxScroll) {
+    centerIndex = options.length - 1;
+  } else {
+    centerIndex = Math.floor((scrollTop + optionHeight / 2) / optionHeight);
+  }
   
   // 범위 검사
   if (centerIndex >= 0 && centerIndex < options.length) {
