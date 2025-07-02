@@ -118,26 +118,17 @@ export function initFontPicker() {
     }
   }, { passive: true });
 
-  // 디바운스 최적화된 스크롤 이벤트 (passive listener for smooth scrolling)
-  fontPickerWheel.addEventListener('scroll', debounce(updateSelectedFont, 50), { passive: true });
-
-  // 마우스 휠 이벤트를 직접 처리하여 더 정밀한 제어
-  fontPickerWheel.addEventListener('wheel', function(e) {
-    e.preventDefault();
-    
-    const optionHeight = 40;
-    const currentScrollTop = fontPickerWheel.scrollTop;
-    const wheelDirection = e.deltaY > 0 ? 1 : -1;
-    
-    // 한 번에 하나의 옵션만큼만 스크롤
-    const newScrollTop = currentScrollTop + (wheelDirection * optionHeight);
-    
-    // 스크롤 범위 제한
-    const maxScrollTop = fontPickerWheel.scrollHeight - fontPickerWheel.clientHeight;
-    const limitedScrollTop = Math.max(0, Math.min(newScrollTop, maxScrollTop));
-    
-    fontPickerWheel.scrollTop = limitedScrollTop;
-  }, { passive: false });
+  // 스크롤 이벤트 최적화: rAF를 이용해 부드러운 선택
+  let isTicking = false;
+  fontPickerWheel.addEventListener('scroll', function() {
+    if (!isTicking) {
+      window.requestAnimationFrame(() => {
+        updateSelectedFont();
+        isTicking = false;
+      });
+      isTicking = true;
+    }
+  }, { passive: true });
 
   // 초기 모달 폰트 디스플레이 설정
   updateFontDisplay();
