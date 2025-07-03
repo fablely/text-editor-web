@@ -16,6 +16,7 @@ class StickerControls {
 
   init() {
     this.popup = document.getElementById('stickerEditPopup');
+    this.colorPicker = document.getElementById('stickerColor'); // 색상 선택기
     this.sizeSlider = document.getElementById('stickerSize');
     this.rotationSlider = document.getElementById('stickerRotation');
     this.opacitySlider = document.getElementById('stickerOpacity');
@@ -27,6 +28,13 @@ class StickerControls {
 
   bindEvents() {
     if (!this.popup) return;
+
+    // 색상 변경 지원
+    if (this.colorPicker) {
+      this.colorPicker.addEventListener('input', (e) => {
+        this.updateStickerColor(e.target.value);
+      });
+    }
 
     // 크기 조정
     this.sizeSlider.addEventListener('mousedown', () => {
@@ -287,6 +295,25 @@ class StickerControls {
     if (this.currentSticker) {
       this.hidePopup();
     }
+  }
+
+  // SVG 스티커 색상 업데이트
+  async updateStickerColor(color) {
+    if (!this.currentSticker || !this.currentSticker.image.src.endsWith('.svg')) return;
+    // 원본 SVG 문자열 가져오기 (첫 호출 시만)
+    if (!this.currentSticker.svgString) {
+      const resp = await fetch(this.currentSticker.image.src);
+      this.currentSticker.svgString = await resp.text();
+    }
+    // fill 속성 교체 (root 또는 path에 적용)
+    let svg = this.currentSticker.svgString;
+    // 기본 fill 속성을 모두 currentColor로 변경 가정
+    svg = svg.replace(/fill=".*?"/g, `fill="${color}"`);
+    const encoded = encodeURIComponent(svg);
+    const dataUrl = `data:image/svg+xml;charset=utf8,${encoded}`;
+    // 새로운 이미지로 설정
+    this.currentSticker.image.src = dataUrl;
+    renderCanvas();
   }
 }
 
