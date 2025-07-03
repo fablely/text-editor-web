@@ -1368,11 +1368,19 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
 }
 
 /* 순서 조정 버튼 레이아웃 - 라벨 오른쪽에 2x2 그리드 배치 */
+/* 순서 조정 버튼 레이아웃 - 라벨 오른쪽에 2x2 그리드 배치 */
 .text-control-modal .row.layer-controls,
 .sticker-control-modal .row.layer-controls {
   display: flex;
-  flex-direction: row;
   align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.text-control-modal .row,
+.sticker-control-modal .row {
+  display: flex;
+  align-items: center;
   gap: 8px;
   margin-bottom: 12px;
 }
@@ -1380,47 +1388,30 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
 .text-control-modal .row.layer-controls .layer-buttons,
 .sticker-control-modal .row.layer-controls .layer-buttons {
   display: grid;
-  grid-template-columns: auto auto;
-  grid-template-rows: auto auto;
+  grid-template: auto auto / auto auto;
   gap: 4px;
   flex: 1;
 }
 
-/* 다른 row들은 기존대로 가로 배치 */
-.text-control-modal .row:not(.layer-controls),
-.sticker-control-modal .row:not(.layer-controls) {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  align-items: center !important;
-  gap: 8px !important;
-  margin-bottom: 12px !important;
+/* 버튼 공통 스타일 */
+.text-control-modal .small-button,
+.sticker-control-modal .small-button {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }
 
-/* 순서 조정 버튼 스타일 */
+/* 순서 조정 버튼만 스타일 추가 */
 .text-control-modal .layer-buttons .small-button,
 .sticker-control-modal .layer-buttons .small-button {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
   padding: 2px 4px;
   font-size: 11px;
-  min-width: auto;
-  width: auto;
   height: 22px;
   border-radius: 4px;
-}
-
-/* 다른 작은 버튼들은 기존 스타일 유지 */
-.text-control-modal .small-button:not(.layer-buttons .small-button),
-.sticker-control-modal .small-button:not(.layer-buttons .small-button) {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
+  min-width: auto;
+  width: auto;
 }
 
 /* 스티커 컨트롤 모달 슬라이더 행 레이아웃 */
@@ -1464,26 +1455,26 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
     max-width: 100%;
   }
   
-  /* 순서 조정 버튼만 작게 */
+  /* 모바일: 버튼 기본 스타일 */
+  .text-control-modal .small-button,
+  .sticker-control-modal .small-button {
+    padding: 10px 16px;
+    font-size: 13px;
+    min-width: 70px;
+    height: 36px;
+    border-radius: 12px;
+  }
+
+  /* 모바일: 순서 조정 버튼만 작게 */
   .text-control-modal .layer-buttons .small-button,
   .sticker-control-modal .layer-buttons .small-button {
     padding: 1px 2px;
     font-size: 7px;
-    min-width: auto;
-    width: auto;
     height: 18px;
     border-radius: 3px;
     margin: 0;
-  }
-  
-  /* 다른 일반 버튼들은 원래 크기 유지 */
-  .text-control-modal .small-button:not(.row .small-button),
-  .sticker-control-modal .small-button:not(.row .small-button) {
-    padding: 10px 16px !important;
-    font-size: 13px !important;
-    min-width: 70px !important;
-    height: 36px !important;
-    border-radius: 12px !important;
+    min-width: auto;
+    width: auto;
   }
   
   /* 순서 버튼이 있는 행의 라벨 조정 */
