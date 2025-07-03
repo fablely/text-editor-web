@@ -311,9 +311,11 @@ class StickerControls {
     svg = svg.replace(/fill=".*?"/g, `fill="${color}"`);
     const encoded = encodeURIComponent(svg);
     const dataUrl = `data:image/svg+xml;charset=utf8,${encoded}`;
-    // 새로운 이미지로 설정
+    // 새로운 SVG src로 설정 후 로딩 완료 시 캔버스 다시 렌더링
+    this.currentSticker.image.onload = () => {
+      renderCanvas();
+    };
     this.currentSticker.image.src = dataUrl;
-    renderCanvas();
   }
 }
 

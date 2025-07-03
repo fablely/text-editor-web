@@ -53,8 +53,11 @@ class StickerLoader {
   }
 
   async loadStickerList() {
-    // sticker1.png, sticker2.png ... sticker100.png 형태로 자동 인식
-    const stickerPatterns = Array.from({length: 100}, (_, i) => `sticker${i + 1}.png`);
+    // sticker1.png, sticker2.png ... sticker100.png 및 .svg 형태로 자동 인식
+    const exts = ['png', 'svg'];
+    const stickerPatterns = exts.flatMap(ext =>
+      Array.from({length: 100}, (_, i) => `sticker${i + 1}.${ext}`)
+    );
 
     this.stickerList = [];
     let loadedCount = 0;
