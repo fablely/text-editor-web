@@ -6,6 +6,7 @@ import { updateModalControls } from './canvasRenderer.js';
 // 전역 변수 선언을 최적화
 let currentFontSelector = null; 
 let selectedFontIndex = 0;
+let isUserScrolling = false; // 스크롤 상태 추적
 let fontOptions = [
   { value: 'Inter, sans-serif', text: 'Inter' },
   { value: '강원교육모두', text: '강원교육모두' },
@@ -111,24 +112,64 @@ export function initFontPicker() {
   };
   
   fontPickerWheel.addEventListener('click', eventListeners.fontPickerWheel);
-  // 터치 선택 지원 (tap 시 선택, 스크롤은 유지)
+  
+  // 터치 이벤트 개선 - 스크롤과 탭 구분
+  let touchStartY = 0;
+  let touchStartTime = 0;
+  let isScrolling = false;
+  
+  fontPickerWheel.addEventListener('touchstart', function(e) {
+    if (e.target.classList.contains('font-option')) {
+      touchStartY = e.touches[0].clientY;
+      touchStartTime = Date.now();
+      isScrolling = false;
+    }
+  }, { passive: true });
+  
+  fontPickerWheel.addEventListener('touchmove', function(e) {
+    if (touchStartY !== 0) {
+      const touchMoveY = e.touches[0].clientY;
+      const deltaY = Math.abs(touchMoveY - touchStartY);
+      
+      // 5px 이상 움직이면 스크롤로 판단
+      if (deltaY > 5) {
+        isScrolling = true;
+      }
+    }
+  }, { passive: true });
+  
   fontPickerWheel.addEventListener('touchend', function(e) {
     if (e.target.classList.contains('font-option')) {
-      eventListeners.fontPickerWheel(e);
+      const touchEndTime = Date.now();
+      const touchDuration = touchEndTime - touchStartTime;
+      
+      // 스크롤이 아니고, 빠른 탭(300ms 이하)인 경우만 선택 처리
+      if (!isScrolling && touchDuration < 300) {
+        eventListeners.fontPickerWheel(e);
+      }
     }
+    
+    // 터치 상태 초기화
+    touchStartY = 0;
+    touchStartTime = 0;
+    isScrolling = false;
   }, { passive: true });
 
   // 모바일 터치를 위한 스크롤 이벤트 최적화
   let scrollTimeout;
+  
   fontPickerWheel.addEventListener('scroll', function() {
-    // 즉시 업데이트 (터치 스크롤 반응성 향상)
-    updateSelectedFont();
+    // 사용자가 스크롤 중임을 표시
+    isUserScrolling = true;
+    
+    // 즉시 업데이트는 제거 (터치 스크롤 중 불필요한 변경 방지)
     
     // 스크롤 완료 후 최종 정정 (디바운스)
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(() => {
       updateSelectedFont();
-    }, 150);
+      isUserScrolling = false;
+    }, 200); // 200ms로 증가하여 더 안정적으로
   }, { passive: true });
 
   // 초기 모달 폰트 디스플레이 설정
@@ -223,7 +264,7 @@ function updateSelectedFont() {
     options[centerIndex].classList.add('selected');
     selectedFontIndex = centerIndex;
     
-    // 폰트 변경을 즉시 미리보기로 적용 (실시간 업데이트)
+    // 스크롤이 완전히 멈춘 후에만 폰트 미리보기 적용
     previewFontSelection();
   }
 }
