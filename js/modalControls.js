@@ -19,17 +19,73 @@ export function initModalControls() {
   
   // 스크롤 이벤트 처리 (텍스트 모달 위치 업데이트)
   let scrollTimeout;
+  let isScrolling = false;
+  let lastScrollTime = 0;
+  
   const scrollHandler = () => {
     if (state.selectedText && !modal.classList.contains('hidden')) {
       positionModalNearText(state.selectedText);
     }
+    isScrolling = false;
   };
   
+  // 즉각적인 위치 업데이트 (모바일 대응)
+  const immediateScrollHandler = () => {
+    if (state.selectedText && !modal.classList.contains('hidden')) {
+      const now = Date.now();
+      // 너무 빈번한 호출 방지 (60fps 제한)
+      if (now - lastScrollTime > 16) {
+        positionModalNearText(state.selectedText);
+        lastScrollTime = now;
+      }
+    }
+  };
+  
+  // 스크롤 이벤트 리스너들 (모바일 호환성을 위해 여러 이벤트 등록)
+  window.addEventListener('scroll', immediateScrollHandler, { passive: true });
+  document.addEventListener('scroll', immediateScrollHandler, { passive: true });
+  
+  // iOS Safari를 위한 추가 이벤트
+  document.body.addEventListener('scroll', immediateScrollHandler, { passive: true });
+  
+  // 터치 스크롤 이벤트도 처리 (모바일 전용)
+  let touchScrollTimeout;
+  window.addEventListener('touchmove', () => {
+    if (state.selectedText && !modal.classList.contains('hidden')) {
+      if (touchScrollTimeout) {
+        clearTimeout(touchScrollTimeout);
+      }
+      // 터치 스크롤 중에는 더 빠르게 업데이트
+      touchScrollTimeout = setTimeout(() => {
+        positionModalNearText(state.selectedText);
+      }, 5);
+    }
+  }, { passive: true });
+  
+  // 터치 종료 시 정확한 위치 조정
+  window.addEventListener('touchend', () => {
+    if (state.selectedText && !modal.classList.contains('hidden')) {
+      setTimeout(() => {
+        positionModalNearText(state.selectedText);
+      }, 50);
+    }
+  }, { passive: true });
+  
+  // 스크롤 종료 후 정확한 위치 조정
   window.addEventListener('scroll', () => {
     if (scrollTimeout) {
       clearTimeout(scrollTimeout);
     }
-    scrollTimeout = setTimeout(scrollHandler, 16); // ~60fps
+    scrollTimeout = setTimeout(scrollHandler, 50); // 스크롤 종료 후 정확한 위치
+  }, { passive: true });
+  
+  // orientationchange 이벤트 처리 (모바일 회전 시)
+  window.addEventListener('orientationchange', () => {
+    if (state.selectedText && !modal.classList.contains('hidden')) {
+      setTimeout(() => {
+        positionModalNearText(state.selectedText);
+      }, 100);
+    }
   });
 
   // 윈도우 리사이즈 시에도 위치 업데이트
@@ -37,6 +93,32 @@ export function initModalControls() {
     if (state.selectedText && !modal.classList.contains('hidden')) {
       positionModalNearText(state.selectedText);
     }
+  });
+  
+  // 모바일 키보드 표시/숨김 시 뷰포트 변경 처리
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      if (state.selectedText && !modal.classList.contains('hidden')) {
+        setTimeout(() => {
+          positionModalNearText(state.selectedText);
+        }, 100);
+      }
+    });
+  }
+  
+  // 모바일에서 주소창 숨김/표시 시 처리
+  let lastViewportHeight = window.innerHeight;
+  window.addEventListener('resize', () => {
+    const currentViewportHeight = window.innerHeight;
+    if (Math.abs(currentViewportHeight - lastViewportHeight) > 100) {
+      // 뷰포트 높이가 크게 변경된 경우 (키보드 표시/숨김 등)
+      if (state.selectedText && !modal.classList.contains('hidden')) {
+        setTimeout(() => {
+          positionModalNearText(state.selectedText);
+        }, 150);
+      }
+    }
+    lastViewportHeight = currentViewportHeight;
   });
   
   // 이벤트 리스너 등록을 최적화

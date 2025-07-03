@@ -1,6 +1,30 @@
 // js/canvasRenderer.js
 import { state } from './state.js';
 
+// 모바일 브라우저 호환 뷰포트 높이 계산
+function getViewportHeight() {
+  // iOS Safari의 경우 window.innerHeight가 주소창/툴바 포함 높이를 반환할 수 있음
+  // visualViewport API를 사용할 수 있으면 사용
+  if (window.visualViewport) {
+    return window.visualViewport.height;
+  }
+  
+  // 일반적인 방법들을 시도
+  return window.innerHeight || 
+         document.documentElement.clientHeight || 
+         document.body.clientHeight;
+}
+
+function getViewportWidth() {
+  if (window.visualViewport) {
+    return window.visualViewport.width;
+  }
+  
+  return window.innerWidth || 
+         document.documentElement.clientWidth || 
+         document.body.clientWidth;
+}
+
 // 모든 요소들을 하나의 배열로 통합하여 레이어 순서 관리
 function getAllElements() {
   const allElements = [];
@@ -287,60 +311,80 @@ export function positionModalNearText(textObj) {
   const modalHeight = 160;
   const padding = 10;
   
-  // 텍스트의 화면상 위치 계산 (스크롤 위치 포함)
-  const textScreenX = canvasRect.left + textObj.x;
-  const textScreenY = canvasRect.top + textObj.y;
+  // 캔버스의 실제 크기와 논리적 크기 비율 계산
+  const displayWidth = canvasRect.width;
+  const displayHeight = canvasRect.height;
+  const logicalWidth = state.canvasWidth || state.canvas.width;
+  const logicalHeight = state.canvasHeight || state.canvas.height;
+  
+  // 논리적 좌표를 화면 좌표로 변환하는 비율
+  const scaleX = displayWidth / logicalWidth;
+  const scaleY = displayHeight / logicalHeight;
+  
+  // 텍스트의 화면상 위치 계산 (스케일링 적용)
+  const textScreenX = canvasRect.left + (textObj.x * scaleX);
+  const textScreenY = canvasRect.top + (textObj.y * scaleY);
 
   state.ctx.font = `${textObj.size}px ${textObj.fontFamily}`;
   let textWidth, textHeight;
   if (textObj.direction === 'vertical') {
-    textWidth = textObj.size;
-    textHeight = textObj.text.length * textObj.size;
+    textWidth = textObj.size * scaleX;
+    textHeight = textObj.text.length * textObj.size * scaleY;
   } else {
-    textWidth = state.ctx.measureText(textObj.text).width;
-    textHeight = textObj.size;
+    textWidth = state.ctx.measureText(textObj.text).width * scaleX;
+    textHeight = textObj.size * scaleY;
   }
 
-  // 모달을 텍스트 하단 중앙에 배치 (현재 스크롤 위치 기준)
+  // 현재 뷰포트 정보 (스크롤 고려)
+  const viewportWidth = getViewportWidth();
+  const viewportHeight = getViewportHeight();
+  const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+  const scrollX = window.scrollX || window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0;
+
+  // 모달의 기본 위치 계산 (텍스트 하단 중앙)
   let modalX = textScreenX + textWidth / 2 - modalWidth / 2;
   let modalY = textScreenY + textHeight + 20;
 
-  // 현재 뷰포트 정보 (스크롤 고려)
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  const scrollY = window.scrollY || window.pageYOffset;
+  // 뷰포트 경계 계산
+  const viewportTop = scrollY;
+  const viewportBottom = scrollY + viewportHeight;
+  const viewportLeft = scrollX;
+  const viewportRight = scrollX + viewportWidth;
 
-  // 좌우 경계 체크
-  if (modalX < padding) {
-    modalX = padding;
-  } else if (modalX + modalWidth > viewportWidth - padding) {
-    modalX = viewportWidth - modalWidth - padding;
+  // X 좌표 조정 (좌우 경계)
+  if (modalX < viewportLeft + padding) {
+    modalX = viewportLeft + padding;
+  } else if (modalX + modalWidth > viewportRight - padding) {
+    modalX = viewportRight - modalWidth - padding;
   }
 
-  // 아래쪽에 공간이 없으면 위쪽에 배치 (뷰포트 기준)
-  if (modalY > scrollY + viewportHeight - modalHeight - padding) {
+  // Y 좌표 조정 (상하 경계)
+  if (modalY + modalHeight > viewportBottom - padding) {
+    // 텍스트 위쪽에 배치
     modalY = textScreenY - modalHeight - 20;
   }
 
-  // 위쪽에도 공간이 없으면 텍스트 옆에 배치
-  if (modalY < scrollY + padding) {
-    modalY = textScreenY - modalHeight / 2;
-    
-    // 오른쪽 우선 배치
-    modalX = textScreenX + textWidth + 20;
-    
-    // 오른쪽에 공간이 없으면 왼쪽에 배치
-    if (modalX + modalWidth > viewportWidth - padding) {
-      modalX = textScreenX - modalWidth - 20;
-    }
+  // 모달이 뷰포트 위쪽을 벗어나는지 확인
+  if (modalY < viewportTop + padding) {
+    modalY = viewportTop + padding;
   }
+
+  // 최종적으로 뷰포트 범위 내에 강제로 배치
+  modalY = Math.max(viewportTop + padding, Math.min(modalY, viewportBottom - modalHeight - padding));
 
   const modal = document.getElementById('textControlModal');
   if (modal) {
-    modal.style.position = 'absolute';
-    modal.style.left = `${Math.max(padding, modalX)}px`;
-    modal.style.top = `${Math.max(scrollY + padding, modalY)}px`;
+    // position: fixed를 사용하여 뷰포트 기준으로 배치
+    modal.style.position = 'fixed';
+    
+    // fixed 위치에서는 스크롤 오프셋을 빼야 함
+    const fixedX = modalX - scrollX;
+    const fixedY = modalY - scrollY;
+    
+    modal.style.left = `${fixedX}px`;
+    modal.style.top = `${fixedY}px`;
     modal.style.zIndex = '1000';
+    modal.style.transform = 'none';
   }
 }
 

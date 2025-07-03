@@ -29,6 +29,10 @@ export function initTextControls() {
   document.getElementById('addTextBtn').addEventListener('click', () => {
     if (!txtInput.value.trim()) {
       alert('텍스트를 입력해주세요');
+      // 텍스트가 비어있을 때 입력창에 포커스
+      setTimeout(() => {
+        txtInput.focus();
+      }, 100);
       return;
     }
 
@@ -55,34 +59,49 @@ export function initTextControls() {
     
     console.log('텍스트 추가:', newText); // 디버깅 로그 추가
     state.textObjects.push(newText);
+    
+    // 텍스트 입력창 비우기
+    txtInput.value = '';
+    
     renderCanvas();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // 추가된 텍스트에 바로 포커스 및 선택 상태로 만들기
     setTimeout(() => {
       state.selectedText = newText;
-      // 첫 모달 오픈 시 삭제 버튼 동작을 위해 선택 요소 설정
       state.selectedElement = newText;
       state.selectedElementType = 'text';
       updateModalControls(newText);
       positionModalNearText(newText);      
       document.getElementById('textControlModal').classList.remove('hidden');
       renderCanvas();
-      
-      // 텍스트 입력창에 포커스 및 내용 선택
-      setTimeout(() => {
-        const modalTextInput = document.getElementById('modalTextContent');
-        if (modalTextInput) {
-          modalTextInput.focus();
-          modalTextInput.select(); // 기존 텍스트 전체 선택으로 바로 수정 가능
-        }
-      }, 100); // 모달이 완전히 표시된 후 포커스
     }, 500);
+    
   });
 
+
+  // 텍스트 모드 버튼 클릭 시 텍스트 입력창 포커스
+  const textModeBtn = document.getElementById('textModeBtn');
+  if (textModeBtn) {
+    textModeBtn.addEventListener('click', () => {
+      setTimeout(() => {
+        txtInput.focus();
+      }, 100);
+    });
+  }
   // 텍스트 입력 이벤트 (모달에서만 사용)
   txtInput.addEventListener('input', () => {
     if (!state.selectedText) return;
     state.selectedText.text = txtInput.value;
     renderCanvas();
+  });
+
+  // Enter 키를 눌렀을 때 텍스트 추가
+  txtInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('addTextBtn').click();
+    }
   });
 
   // 이미지 업로드 요구 팝업 확인 버튼 이벤트
