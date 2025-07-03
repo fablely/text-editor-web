@@ -732,9 +732,15 @@ body {
       0 0 0 1px rgba(255, 255, 255, 0.3);
     padding: 16px;
     width: 300px;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* 스크롤 시 즉각적인 위치 이동을 위해 transition 제거 */
     border: 1px solid rgba(255, 255, 255, 0.2);
     animation: modal-appear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* 모바일에서 부드러운 스크롤 추적을 위한 최적화 */
+    will-change: auto;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
   
   @keyframes modal-appear {
@@ -769,6 +775,11 @@ body {
     color: #374151;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(0, 0, 0, 0.1);
+    /* 모바일 포커스 개선 */
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-tap-highlight-color: rgba(102, 126, 234, 0.3);
+    touch-action: manipulation;
   }
   
   /* 모달 내 방향 드롭다운을 중앙 버튼과 같은 크기로 조정 */
