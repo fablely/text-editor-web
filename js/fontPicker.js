@@ -33,8 +33,7 @@ let fontPickerModal, fontPickerWheel, cancelFontPicker, confirmFontPicker;
 // 이벤트 리스너 참조 저장 (메모리 누수 방지)
 const eventListeners = {
   cancelFontPicker: null,
-  confirmFontPicker: null,
-  fontPickerWheel: null
+  confirmFontPicker: null
 };
 
 export function initFontPicker() {
@@ -90,99 +89,44 @@ export function initFontPicker() {
   
   confirmFontPicker.addEventListener('click', eventListeners.confirmFontPicker);
 
-  // 폰트 옵션 클릭 이벤트 - 이벤트 위임 사용
+  // 폰트 옵션 선택 - 스크롤 방식만 사용 (클릭/터치 선택 제거)
+  // 기존 클릭/터치 이벤트 리스너 제거
   if (eventListeners.fontPickerWheel) {
     fontPickerWheel.removeEventListener('click', eventListeners.fontPickerWheel);
   }
   
-  eventListeners.fontPickerWheel = (e) => {
-    if (e.target.classList.contains('font-option')) {
-      const options = fontPickerWheel.querySelectorAll('.font-option');
-      options.forEach(opt => opt.classList.remove('selected'));
-      
-      e.target.classList.add('selected');
-      selectedFontIndex = parseInt(e.target.dataset.index);
-      
-      // 스크롤 위치 조정 - 메모리 최적화 위해 여기서만 직접 계산
-      const optionHeight = 40;
-      const desiredScroll = selectedFontIndex * optionHeight;
-      const maxScroll = fontPickerWheel.scrollHeight - fontPickerWheel.clientHeight;
-      fontPickerWheel.scrollTop = Math.min(desiredScroll, maxScroll);
-    }
-  };
-  
-  fontPickerWheel.addEventListener('click', eventListeners.fontPickerWheel);
-  
-  // 터치 이벤트 개선 - 스크롤과 탭 구분
-  let touchStartY = 0;
-  let touchStartTime = 0;
-  let isScrolling = false;
-  
-  fontPickerWheel.addEventListener('touchstart', function(e) {
-    if (e.target.classList.contains('font-option')) {
-      touchStartY = e.touches[0].clientY;
-      touchStartTime = Date.now();
-      isScrolling = false;
-    }
-  }, { passive: true });
-  
-  fontPickerWheel.addEventListener('touchmove', function(e) {
-    if (touchStartY !== 0) {
-      const touchMoveY = e.touches[0].clientY;
-      const deltaY = Math.abs(touchMoveY - touchStartY);
-      
-      // 5px 이상 움직이면 스크롤로 판단
-      if (deltaY > 5) {
-        isScrolling = true;
-      }
-    }
-  }, { passive: true });
-  
-  fontPickerWheel.addEventListener('touchend', function(e) {
-    if (e.target.classList.contains('font-option')) {
-      const touchEndTime = Date.now();
-      const touchDuration = touchEndTime - touchStartTime;
-      
-      // 스크롤이 아니고, 빠른 탭(300ms 이하)인 경우만 선택 처리
-      if (!isScrolling && touchDuration < 300) {
-        eventListeners.fontPickerWheel(e);
-      }
-    }
-    
-    // 터치 상태 초기화
-    touchStartY = 0;
-    touchStartTime = 0;
-    isScrolling = false;
-  }, { passive: true });
-
-  // 모바일 터치를 위한 스크롤 이벤트 최적화
+  // 스크롤 이벤트만 사용
   let scrollTimeout;
+  
+  // fontPickerWheel에 클릭 이벤트 완전 차단
+  fontPickerWheel.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }, { passive: false });
+  
+  fontPickerWheel.addEventListener('touchstart', (e) => {
+    // 터치 스크롤은 허용하되, 탭 동작은 방지
+    e.stopPropagation();
+  }, { passive: true });
   
   fontPickerWheel.addEventListener('scroll', function() {
     // 사용자가 스크롤 중임을 표시
     isUserScrolling = true;
     
-    // 즉시 업데이트는 제거 (터치 스크롤 중 불필요한 변경 방지)
+    // 즉시 선택 항목 하이라이트 (빠른 시각적 반응)
+    updateSelectedFontHighlight();
     
-    // 스크롤 완료 후 최종 정정 (디바운스)
+    // 스크롤 완료 후 폰트 미리보기 적용 (디바운스)
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(() => {
-      updateSelectedFont();
+      previewFontSelection();
       isUserScrolling = false;
-    }, 200); // 200ms로 증가하여 더 안정적으로
+    }, 50); // 50ms로 대폭 줄여서 더 빠른 반응
   }, { passive: true });
 
   // 초기 모달 폰트 디스플레이 설정
   updateFontDisplay();
-
-  // 터치 이벤트 최적화
-  fontPickerModal.addEventListener('touchmove', function(e) {
-    e.stopPropagation();
-  }, { passive: false });
-
-  fontPickerWheel.addEventListener('touchmove', function(e) {
-    // 스크롤 허용
-  }, { passive: true });
 }
 
 // 폰트 선택기 닫기 - 코드 중복 제거
@@ -218,6 +162,37 @@ function openFontPicker(selectorObj) {
     div.textContent = option.text;
     div.style.fontFamily = option.value;
     div.dataset.index = index;
+    
+    // 클릭, 터치, 포커스 이벤트 완전 차단
+    div.style.pointerEvents = 'none';
+    div.style.userSelect = 'none';
+    div.tabIndex = -1; // 탭 포커스 방지
+    
+    // 모든 마우스/터치 이벤트 차단
+    div.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }, { passive: false });
+    
+    div.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }, { passive: false });
+    
+    div.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }, { passive: false });
+    
+    div.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }, { passive: false });
+    
     fontPickerWheel.appendChild(div);
   });
 
@@ -238,24 +213,29 @@ function openFontPicker(selectorObj) {
   }, 50);
 }
 
-// 스크롤 위치에 따라 선택된 폰트 업데이트
+// 스크롤 완료 후 폰트 미리보기 적용
 function updateSelectedFont() {
+  // 폰트 미리보기만 적용 (하이라이트는 이미 updateSelectedFontHighlight에서 처리됨)
+  previewFontSelection();
+}
+
+// 스크롤 시 즉시 하이라이트 업데이트 (시각적 반응만)
+function updateSelectedFontHighlight() {
   const fontPickerWheel = document.getElementById('fontPickerWheel');
   const options = fontPickerWheel.querySelectorAll('.font-option');
-  const optionHeight = 40; // font-option의 높이
+  const optionHeight = 40;
   const scrollTop = fontPickerWheel.scrollTop;
   const maxScroll = fontPickerWheel.scrollHeight - fontPickerWheel.clientHeight;
   
-  // 스크롤 위치에 따라 중앙에 있는 옵션 찾기 (정확한 위치 계산)
-  // 가이드라인과 정확히 일치하도록 계산 (80px 패딩 고려)
+  // 스크롤 위치에 따라 중앙에 있는 옵션 찾기
   let centerIndex;
   if (scrollTop >= maxScroll) {
     centerIndex = options.length - 1;
   } else {
-    centerIndex = Math.floor((scrollTop + optionHeight / 2) / optionHeight);
+    centerIndex = Math.round(scrollTop / optionHeight);
   }
   
-  // 범위 검사
+  // 범위 검사 및 하이라이트만 업데이트
   if (centerIndex >= 0 && centerIndex < options.length) {
     // 이전 선택 항목 클래스 제거
     options.forEach(opt => opt.classList.remove('selected'));
@@ -263,9 +243,6 @@ function updateSelectedFont() {
     // 새 선택 항목에 클래스 추가
     options[centerIndex].classList.add('selected');
     selectedFontIndex = centerIndex;
-    
-    // 스크롤이 완전히 멈춘 후에만 폰트 미리보기 적용
-    previewFontSelection();
   }
 }
 

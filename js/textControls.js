@@ -66,6 +66,15 @@ export function initTextControls() {
       positionModalNearText(newText);      
       document.getElementById('textControlModal').classList.remove('hidden');
       renderCanvas();
+      
+      // 텍스트 입력창에 포커스 및 내용 선택
+      setTimeout(() => {
+        const modalTextInput = document.getElementById('modalTextContent');
+        if (modalTextInput) {
+          modalTextInput.focus();
+          modalTextInput.select(); // 기존 텍스트 전체 선택으로 바로 수정 가능
+        }
+      }, 100); // 모달이 완전히 표시된 후 포커스
     }, 500);
   });
 

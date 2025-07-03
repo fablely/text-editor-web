@@ -165,8 +165,13 @@ export function initModalControls() {
 
   // 이벤트 위임을 사용하여 모달 외부 클릭 처리 최적화
   document.addEventListener('mousedown', e => {
+    // 폰트 피커 모달도 텍스트 편집 모달의 일부로 간주
+    const fontPickerModal = document.getElementById('fontPickerModal');
+    const isClickInsideFontPicker = fontPickerModal && fontPickerModal.contains(e.target);
+    
     if (!modal.classList.contains('hidden') && 
         !modal.contains(e.target) && 
+        !isClickInsideFontPicker &&
         e.target !== state.canvas) {
       modal.classList.add('hidden');
       state.selectedText = null;
