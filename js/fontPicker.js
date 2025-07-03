@@ -118,16 +118,17 @@ export function initFontPicker() {
     }
   }, { passive: true });
 
-  // 스크롤 이벤트 최적화: rAF를 이용해 부드러운 선택
-  let isTicking = false;
+  // 모바일 터치를 위한 스크롤 이벤트 최적화
+  let scrollTimeout;
   fontPickerWheel.addEventListener('scroll', function() {
-    if (!isTicking) {
-      window.requestAnimationFrame(() => {
-        updateSelectedFont();
-        isTicking = false;
-      });
-      isTicking = true;
-    }
+    // 즉시 업데이트 (터치 스크롤 반응성 향상)
+    updateSelectedFont();
+    
+    // 스크롤 완료 후 최종 정정 (디바운스)
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      updateSelectedFont();
+    }, 150);
   }, { passive: true });
 
   // 초기 모달 폰트 디스플레이 설정
