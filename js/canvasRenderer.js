@@ -65,6 +65,11 @@ function renderSticker(sticker) {
   ctx.rotate((sticker.rotation * Math.PI) / 180);
   ctx.globalAlpha = sticker.opacity;
   
+  // CSS filter를 사용한 색상 변경이 적용된 경우
+  if (sticker.colorFilter && sticker.colorFilter.filter) {
+    ctx.filter = sticker.colorFilter.filter;
+  }
+  
   // 스티커 그리기 (중앙 정렬)
   ctx.drawImage(
     sticker.image,
@@ -73,6 +78,9 @@ function renderSticker(sticker) {
     sticker.width,
     sticker.height
   );
+  
+  // filter 초기화
+  ctx.filter = 'none';
   
   // 선택된 스티커에 테두리 효과 적용
   if (sticker === state.selectedElement) {
@@ -276,6 +284,10 @@ export function resizeCanvas(newWidth, newHeight) {
 export function positionModalNearText(textObj) {
   const canvasRect = state.canvas.getBoundingClientRect();
   const modalWidth = 280;
+  const modalHeight = 160;
+  const padding = 10;
+  
+  // 텍스트의 화면상 위치 계산 (스크롤 위치 포함)
   const textScreenX = canvasRect.left + textObj.x;
   const textScreenY = canvasRect.top + textObj.y;
 
@@ -289,16 +301,47 @@ export function positionModalNearText(textObj) {
     textHeight = textObj.size;
   }
 
+  // 모달을 텍스트 하단 중앙에 배치 (현재 스크롤 위치 기준)
   let modalX = textScreenX + textWidth / 2 - modalWidth / 2;
   let modalY = textScreenY + textHeight + 20;
-  if (modalX < 10) modalX = 10;
-  if (modalX + modalWidth > window.innerWidth - 10) {
-    modalX = window.innerWidth - modalWidth - 10;
+
+  // 현재 뷰포트 정보 (스크롤 고려)
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const scrollY = window.scrollY || window.pageYOffset;
+
+  // 좌우 경계 체크
+  if (modalX < padding) {
+    modalX = padding;
+  } else if (modalX + modalWidth > viewportWidth - padding) {
+    modalX = viewportWidth - modalWidth - padding;
+  }
+
+  // 아래쪽에 공간이 없으면 위쪽에 배치 (뷰포트 기준)
+  if (modalY > scrollY + viewportHeight - modalHeight - padding) {
+    modalY = textScreenY - modalHeight - 20;
+  }
+
+  // 위쪽에도 공간이 없으면 텍스트 옆에 배치
+  if (modalY < scrollY + padding) {
+    modalY = textScreenY - modalHeight / 2;
+    
+    // 오른쪽 우선 배치
+    modalX = textScreenX + textWidth + 20;
+    
+    // 오른쪽에 공간이 없으면 왼쪽에 배치
+    if (modalX + modalWidth > viewportWidth - padding) {
+      modalX = textScreenX - modalWidth - 20;
+    }
   }
 
   const modal = document.getElementById('textControlModal');
-  modal.style.left = `${modalX}px`;
-  modal.style.top = `${modalY}px`;
+  if (modal) {
+    modal.style.position = 'absolute';
+    modal.style.left = `${Math.max(padding, modalX)}px`;
+    modal.style.top = `${Math.max(scrollY + padding, modalY)}px`;
+    modal.style.zIndex = '1000';
+  }
 }
 
 export function updateModalControls(textObj) {

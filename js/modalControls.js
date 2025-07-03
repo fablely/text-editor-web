@@ -17,6 +17,28 @@ export function initModalControls() {
     { id: 'modalTextDirection', prop: 'direction', event: 'change', parser: v => v } // change 이벤트 사용
   ];
   
+  // 스크롤 이벤트 처리 (텍스트 모달 위치 업데이트)
+  let scrollTimeout;
+  const scrollHandler = () => {
+    if (state.selectedText && !modal.classList.contains('hidden')) {
+      positionModalNearText(state.selectedText);
+    }
+  };
+  
+  window.addEventListener('scroll', () => {
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout);
+    }
+    scrollTimeout = setTimeout(scrollHandler, 16); // ~60fps
+  });
+
+  // 윈도우 리사이즈 시에도 위치 업데이트
+  window.addEventListener('resize', () => {
+    if (state.selectedText && !modal.classList.contains('hidden')) {
+      positionModalNearText(state.selectedText);
+    }
+  });
+  
   // 이벤트 리스너 등록을 최적화
   controlConfigs.forEach(config => {
     const element = document.getElementById(config.id);
