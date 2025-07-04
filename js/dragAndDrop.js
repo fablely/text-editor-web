@@ -99,7 +99,7 @@ export function initDragAndDrop() {
   function handleMove(e) {
     const { x, y } = getEventPos(e);
     
-    // 크기 조정 모드
+    // 크기 조정 모드 - 모달 위치 고정
     if (state.isResizing && resizeHandle && state.selectedElement) {
       const deltaX = x - initialMousePos.x;
       const deltaY = y - initialMousePos.y;
@@ -115,7 +115,7 @@ export function initDragAndDrop() {
       state.selectedElement.x = x - state.dragOffset.x;
       state.selectedElement.y = y - state.dragOffset.y;
       
-      // 모달 위치 업데이트 (텍스트와 스티커 모두)
+      // 모달 위치 업데이트 (크기 조정 중이 아닐 때만)
       if (state.selectedElementType === 'text') {
         positionModalNearText(state.selectedElement);
       } else if (state.selectedElementType === 'sticker') {
