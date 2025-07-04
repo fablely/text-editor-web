@@ -1,38 +1,7 @@
 // js/saveAndShare.js
 import { state } from './state.js';
+import { getAllElements } from './utils.js';
 import { renderCanvas } from './canvasRenderer.js';
-
-// 모든 요소들을 z-index 순서로 정렬하는 함수
-function getAllElementsForSave() {
-  const allElements = [];
-  
-  // 텍스트 객체들 추가
-  state.textObjects.forEach((text, index) => {
-    allElements.push({
-      type: 'text',
-      element: text,
-      originalIndex: index
-    });
-  });
-  
-  // 스티커들 추가
-  state.stickers.forEach((sticker, index) => {
-    allElements.push({
-      type: 'sticker',
-      element: sticker,
-      originalIndex: index
-    });
-  });
-  
-  // z-index로 정렬 (없으면 기본값 0)
-  allElements.sort((a, b) => {
-    const aZIndex = a.element.zIndex || 0;
-    const bZIndex = b.element.zIndex || 0;
-    return aZIndex - bZIndex;
-  });
-  
-  return allElements;
-}
 
 // 이미지 렌더링을 위한 공통 함수 추출 (코드 중복 제거)
 function renderTextToCanvas(tempCtx, scaleX, scaleY, textElement) {
@@ -110,7 +79,7 @@ function createTempCanvas() {
   const scaleY = state.originalHeight / state.canvasHeight;
   
   // 모든 요소를 z-index 순서대로 렌더링
-  const allElements = getAllElementsForSave();
+  const allElements = getAllElements();
   
   allElements.forEach(item => {
     if (item.type === 'sticker') {

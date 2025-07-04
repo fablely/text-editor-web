@@ -1,5 +1,6 @@
 // js/textControls.js
 import { state } from './state.js';
+import { getNextZIndex } from './utils.js';
 import { renderCanvas, positionModalNearText, updateModalControls } from './canvasRenderer.js';
 
 // 모바일 전용 포커스 함수
@@ -64,27 +65,6 @@ function focusTextInputMobile(input) {
       }
     }, index * 100);
   });
-}
-
-// 다음 사용할 z-index 값을 반환
-function getNextZIndex() {
-  let maxZIndex = 0;
-  
-  // 텍스트 객체들의 최대 z-index 찾기
-  state.textObjects.forEach(text => {
-    if (text.zIndex !== undefined && text.zIndex > maxZIndex) {
-      maxZIndex = text.zIndex;
-    }
-  });
-  
-  // 스티커들의 최대 z-index 찾기
-  state.stickers.forEach(sticker => {
-    if (sticker.zIndex !== undefined && sticker.zIndex > maxZIndex) {
-      maxZIndex = sticker.zIndex;
-    }
-  });
-  
-  return maxZIndex + 1;
 }
 
 export function initTextControls() {

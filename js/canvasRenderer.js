@@ -1,5 +1,6 @@
 // js/canvasRenderer.js
 import { state } from './state.js';
+import { getAllElements } from './utils.js';
 
 // 모바일 브라우저 호환 뷰포트 높이 계산
 function getViewportHeight() {
@@ -23,38 +24,6 @@ function getViewportWidth() {
   return window.innerWidth || 
          document.documentElement.clientWidth || 
          document.body.clientWidth;
-}
-
-// 모든 요소들을 하나의 배열로 통합하여 레이어 순서 관리
-function getAllElements() {
-  const allElements = [];
-  
-  // 텍스트 객체들 추가
-  state.textObjects.forEach((text, index) => {
-    allElements.push({
-      type: 'text',
-      element: text,
-      originalIndex: index
-    });
-  });
-  
-  // 스티커들 추가
-  state.stickers.forEach((sticker, index) => {
-    allElements.push({
-      type: 'sticker',
-      element: sticker,
-      originalIndex: index
-    });
-  });
-  
-  // z-index로 정렬 (없으면 기본값 0)
-  allElements.sort((a, b) => {
-    const aZIndex = a.element.zIndex || 0;
-    const bZIndex = b.element.zIndex || 0;
-    return aZIndex - bZIndex;
-  });
-  
-  return allElements;
 }
 
 export function renderCanvas() {

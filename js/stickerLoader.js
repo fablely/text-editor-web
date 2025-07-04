@@ -1,5 +1,6 @@
 // 스티커 로더 모듈
 import { state } from './state.js';
+import { getNextZIndex } from './utils.js';
 import { renderCanvas } from './canvasRenderer.js';
 
 class StickerLoader {
@@ -8,27 +9,6 @@ class StickerLoader {
     this.selectedSticker = null;
     this.stickerPickerModal = null;
     this.stickerGrid = null;
-  }
-
-  // 다음 사용할 z-index 값을 반환
-  getNextZIndex() {
-    let maxZIndex = 0;
-    
-    // 텍스트 객체들의 최대 z-index 찾기
-    state.textObjects.forEach(text => {
-      if (text.zIndex !== undefined && text.zIndex > maxZIndex) {
-        maxZIndex = text.zIndex;
-      }
-    });
-    
-    // 스티커들의 최대 z-index 찾기
-    state.stickers.forEach(sticker => {
-      if (sticker.zIndex !== undefined && sticker.zIndex > maxZIndex) {
-        maxZIndex = sticker.zIndex;
-      }
-    });
-    
-    return maxZIndex + 1;
   }
 
   async init() {
@@ -216,7 +196,7 @@ class StickerLoader {
       rotation: 0,
       opacity: 1,
       name: this.selectedSticker.name,
-      zIndex: this.getNextZIndex() // 새로운 z-index 할당
+      zIndex: getNextZIndex() // 새로운 z-index 할당
     };
 
     // 스티커를 state에 추가
