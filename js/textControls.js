@@ -88,14 +88,14 @@ function getNextZIndex() {
 }
 
 export function initTextControls() {
-  const txtInput = document.getElementById('textInput');
+  const textInput = document.getElementById('textInput');
 
   document.getElementById('addTextBtn').addEventListener('click', () => {
-    if (!txtInput.value.trim()) {
+    if (!textInput.value.trim()) {
       alert('텍스트를 입력해주세요');
       // 텍스트가 비어있을 때 입력창에 포커스 (모바일 대응)
       setTimeout(() => {
-        focusTextInputMobile(txtInput);
+        focusTextInputMobile(textInput);
       }, 100);
       return;
     }
@@ -108,7 +108,7 @@ export function initTextControls() {
     }
     
     const newText = {
-      text: txtInput.value,
+      text: textInput.value,
       x: 50,
       y: 80,
       fontFamily: 'sans-serif', // 기본 글꼴
@@ -125,7 +125,7 @@ export function initTextControls() {
     state.textObjects.push(newText);
     
     // 텍스트 입력창 비우기
-    txtInput.value = '';
+    textInput.value = '';
     
     renderCanvas();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -144,32 +144,15 @@ export function initTextControls() {
       setTimeout(() => {
         const modal = document.getElementById('textControlModal');
         if (modal.classList.contains('hidden')) {
-          focusTextInputMobile(txtInput);
+          focusTextInputMobile(textInput);
         }
       }, 100);
     }, 500);
     
   });
 
-
-  // 텍스트 모드 버튼 클릭 시 텍스트 입력창 포커스
-  const textModeBtn = document.getElementById('textModeBtn');
-  if (textModeBtn) {
-    textModeBtn.addEventListener('click', () => {
-      setTimeout(() => {
-        focusTextInputMobile(txtInput);
-      }, 100);
-    });
-  }
-  // 텍스트 입력 이벤트 (모달에서만 사용)
-  txtInput.addEventListener('input', () => {
-    if (!state.selectedText) return;
-    state.selectedText.text = txtInput.value;
-    renderCanvas();
-  });
-
   // Enter 키를 눌렀을 때 텍스트 추가
-  txtInput.addEventListener('keypress', (e) => {
+  textInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       document.getElementById('addTextBtn').click();
