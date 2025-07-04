@@ -139,17 +139,19 @@ export function initTextControls() {
       positionModalNearText(newText);      
       document.getElementById('textControlModal').classList.remove('hidden');
       renderCanvas();
-      
-      // 텍스트 추가 후 입력창에 포커스 (모바일 대응)
-      setTimeout(() => {
-        const modal = document.getElementById('textControlModal');
-        if (modal.classList.contains('hidden')) {
-          focusTextInputMobile(textInput);
-        }
-      }, 100);
     }, 500);
     
   });
+
+  // 텍스트 모드 버튼 클릭 시 텍스트 입력창 포커스
+  const textModeBtn = document.getElementById('textModeBtn');
+  if (textModeBtn) {
+    textModeBtn.addEventListener('click', () => {
+      setTimeout(() => {
+        focusTextInputMobile(textInput);
+      }, 100);
+    });
+  }
 
   // Enter 키를 눌렀을 때 텍스트 추가
   textInput.addEventListener('keypress', (e) => {
