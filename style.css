@@ -1469,7 +1469,7 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
   .text-control-modal .layer-buttons .small-button,
   .sticker-control-modal .layer-buttons .small-button {
     padding: 1px 2px;
-    font-size: 7px;
+    font-size: 11px;
     height: 18px;
     border-radius: 3px;
     margin: 0;
@@ -1490,5 +1490,49 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
   .sticker-control-modal {
     width: 280px;
     max-width: 90vw;
+  }
+}
+
+/* 모바일 입력창 개선 */
+@media (max-width: 768px) {
+  #textInput {
+    /* 모바일에서 포커스 받기 쉽게 */
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+    touch-action: manipulation;
+    
+    /* 가상 키보드 최적화 */
+    font-size: 16px !important; /* iOS에서 줌 방지 */
+    line-height: 1.4;
+    
+    /* 터치 영역 확대 */
+    min-height: 44px;
+    padding: 12px 16px;
+    
+    /* 포커스 시각적 강화 */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  #textInput:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25) !important;
+    outline: none !important;
+    background: rgba(255, 255, 255, 1) !important;
+  }
+  
+  /* 모바일에서 입력창 라벨 강화 */
+  .controls label[for="textInput"] {
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  /* 텍스트 추가 버튼 모바일 최적화 */
+  #addTextBtn {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 12px 24px;
+    touch-action: manipulation;
   }
 }
