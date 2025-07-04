@@ -23,7 +23,9 @@ export function initModalControls() {
   let lastScrollTime = 0;
   
   const scrollHandler = () => {
-    if (state.selectedText && !modal.classList.contains('hidden')) {
+    // 드래그나 크기 조정, 텍스트 슬라이더 조정 중이 아닐 때만 모달 위치 업데이트
+    if (state.selectedText && !modal.classList.contains('hidden') && 
+        !state.isDragging && !state.isResizing && !state.isTextSliderAdjusting) {
       positionModalNearText(state.selectedText);
     }
     isScrolling = false;
@@ -31,7 +33,9 @@ export function initModalControls() {
   
   // 즉각적인 위치 업데이트 (모바일 대응)
   const immediateScrollHandler = () => {
-    if (state.selectedText && !modal.classList.contains('hidden')) {
+    // 드래그나 크기 조정, 텍스트 슬라이더 조정 중이 아닐 때만 모달 위치 업데이트
+    if (state.selectedText && !modal.classList.contains('hidden') && 
+        !state.isDragging && !state.isResizing && !state.isTextSliderAdjusting) {
       const now = Date.now();
       // 너무 빈번한 호출 방지 (60fps 제한)
       if (now - lastScrollTime > 16) {
@@ -51,7 +55,9 @@ export function initModalControls() {
   // 터치 스크롤 이벤트도 처리 (모바일 전용)
   let touchScrollTimeout;
   window.addEventListener('touchmove', () => {
-    if (state.selectedText && !modal.classList.contains('hidden')) {
+    // 드래그나 크기 조정, 텍스트 슬라이더 조정 중이 아닐 때만 모달 위치 업데이트
+    if (state.selectedText && !modal.classList.contains('hidden') && 
+        !state.isDragging && !state.isResizing && !state.isTextSliderAdjusting) {
       if (touchScrollTimeout) {
         clearTimeout(touchScrollTimeout);
       }
@@ -64,7 +70,9 @@ export function initModalControls() {
   
   // 터치 종료 시 정확한 위치 조정
   window.addEventListener('touchend', () => {
-    if (state.selectedText && !modal.classList.contains('hidden')) {
+    // 드래그나 크기 조정, 텍스트 슬라이더 조정 중이 아닐 때만 모달 위치 업데이트
+    if (state.selectedText && !modal.classList.contains('hidden') && 
+        !state.isDragging && !state.isResizing && !state.isTextSliderAdjusting) {
       setTimeout(() => {
         positionModalNearText(state.selectedText);
       }, 50);
@@ -260,6 +268,32 @@ export function initModalControls() {
       state.selectedElement = null;
       state.selectedElementType = null;
       renderCanvas();
+    }
+  });
+  
+  // 텍스트 슬라이더들에 조정 중 상태 관리 추가
+  const textSliders = ['modalFontSize', 'modalOpacity', 'modalLetterSpacing', 'modalRotation'];
+  
+  textSliders.forEach(sliderId => {
+    const slider = document.getElementById(sliderId);
+    if (slider) {
+      // 마우스 이벤트 (PC)
+      slider.addEventListener('mousedown', () => {
+        state.isTextSliderAdjusting = true;
+      });
+      
+      slider.addEventListener('mouseup', () => {
+        state.isTextSliderAdjusting = false;
+      });
+      
+      // 터치 이벤트 (모바일)
+      slider.addEventListener('touchstart', () => {
+        state.isTextSliderAdjusting = true;
+      });
+      
+      slider.addEventListener('touchend', () => {
+        state.isTextSliderAdjusting = false;
+      });
     }
   });
 }

@@ -28,9 +28,11 @@ class StickerControls {
   }
 
   bindScrollEvents() {
-    // 스크롤 시 팝업 위치 업데이트 (슬라이더 조정 중이 아닐 때만)
+    // 스크롤 시 팝업 위치 업데이트 (슬라이더 조정 중이 아니고 드래그/크기조정 중이 아닐 때만)
     this.scrollHandler = () => {
-      if (this.currentSticker && this.isFollowingSticker && this.popup && !this.popup.classList.contains('hidden')) {
+      if (this.currentSticker && this.isFollowingSticker && this.popup && 
+          !this.popup.classList.contains('hidden') && 
+          !state.isDragging && !state.isResizing) {
         this.positionModalNearSticker(this.currentSticker);
       }
     };
@@ -46,7 +48,8 @@ class StickerControls {
 
     // 윈도우 리사이즈 시에도 위치 업데이트
     window.addEventListener('resize', () => {
-      if (this.currentSticker && this.popup && !this.popup.classList.contains('hidden')) {
+      if (this.currentSticker && this.popup && !this.popup.classList.contains('hidden') && 
+          !state.isDragging && !state.isResizing) {
         this.positionModalNearSticker(this.currentSticker);
       }
     });

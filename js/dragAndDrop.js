@@ -30,6 +30,12 @@ export function initDragAndDrop() {
       };
       initialMousePos = { x, y };
       canvas.style.cursor = getResizeCursor(resizeHandle);
+      
+      // 스티커 크기 조정 시작 시 모달 위치 고정
+      if (stickerControls && stickerControls.isFollowingSticker !== undefined) {
+        stickerControls.isFollowingSticker = false;
+      }
+      
       e.preventDefault();
       return;
     }
@@ -115,15 +121,8 @@ export function initDragAndDrop() {
       state.selectedElement.x = x - state.dragOffset.x;
       state.selectedElement.y = y - state.dragOffset.y;
       
-      // 모달 위치 업데이트 (크기 조정 중이 아닐 때만)
-      if (state.selectedElementType === 'text') {
-        positionModalNearText(state.selectedElement);
-      } else if (state.selectedElementType === 'sticker') {
-        // 스티커 모달이 슬라이더 조정 중이 아닐 때만 위치 업데이트
-        if (stickerControls.isFollowingSticker) {
-          stickerControls.positionModalNearSticker(state.selectedElement);
-        }
-      }
+      // 모달 위치 업데이트 안함 - 드래그 중에는 모달 위치 고정
+      // 텍스트와 스티커 모두 드래그 중에는 모달이 고정됨
       
       renderCanvas();
       e.preventDefault();
@@ -135,7 +134,24 @@ export function initDragAndDrop() {
   }
 
   function handleEnd() {
+    // 드래그/크기조정 종료 시 모달 위치 업데이트
+    if (state.isDragging && state.selectedElement) {
+      if (state.selectedElementType === 'text') {
+        positionModalNearText(state.selectedElement);
+      } else if (state.selectedElementType === 'sticker') {
+        if (stickerControls && stickerControls.positionModalNearSticker) {
+          stickerControls.positionModalNearSticker(state.selectedElement);
+        }
+      }
+    }
+    
     state.isDragging = false;
+    
+    // 크기 조정 종료 시 모달 위치 추적 재개
+    if (state.isResizing && stickerControls && stickerControls.isFollowingSticker !== undefined) {
+      stickerControls.isFollowingSticker = true;
+    }
+    
     state.isResizing = false;
     resizeHandle = null;
     initialStickerSize = null;

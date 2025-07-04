@@ -11,6 +11,7 @@ export const state = {
   dragOffset: { x: 0, y: 0 },
   isDragging: false,
   isResizing: false, // 크기 조정 상태 추가
+  isTextSliderAdjusting: false, // 텍스트 슬라이더 조정 상태 추가
   originalFileName: "",
   originalFileExt: "jpg",
   originalWidth: 0,
