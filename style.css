@@ -428,8 +428,8 @@ body {
   button:hover {
     transform: translateY(-2px);
     box-shadow: 
-      0 8px 24px rgba(102, 126, 234, 0.4),
-      0 0 0 1px rgba(255, 255, 255, 0.2);
+      0 4px 16px rgba(102, 126, 234, 0.3),
+      0 0 0 1px rgba(255, 255, 255, 0.3);
   }
   
   button:active {
