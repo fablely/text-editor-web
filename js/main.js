@@ -1,6 +1,6 @@
 // js/main.js
 import { initPopup } from './popup.js';
-import { loadFonts, fontsLoadedPromise, fontFiles } from './fontLoader.js';
+import { loadFonts, fontFiles } from './fontLoader.js';
 import { initImageLoader } from './imageLoader.js';
 import { initTextControls } from './textControls.js';
 import { initModalControls } from './modalControls.js';
