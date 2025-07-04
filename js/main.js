@@ -15,6 +15,10 @@ import { initLayerControls } from './layerControls.js';
 document.addEventListener('DOMContentLoaded', async () => {
   initPopup();
   
+  // 모바일 감지
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                   window.innerWidth <= 768;
+  
   // 에디터의 기본 구성요소를 먼저 초기화
   initImageLoader();
   
@@ -55,6 +59,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // 레이어 순서 조정 기능 초기화
   initLayerControls();
+  
+  // 모바일에서 추가 이벤트 리스너
+  if (isMobile) {
+    // 화면 터치 시 텍스트 입력창 활성화 준비
+    document.addEventListener('touchstart', function enableTextInput() {
+      const textInput = document.getElementById('textInput');
+      if (textInput) {
+        // 사용자 상호작용 후 포커스 가능하도록 준비
+        textInput.style.pointerEvents = 'auto';
+        textInput.removeAttribute('readonly');
+      }
+      // 한 번만 실행
+      document.removeEventListener('touchstart', enableTextInput);
+    }, { once: true, passive: true });
+  }
+  
+  // 초기 포커스는 모바일에서 제거 (사용자 상호작용 후에만)
+  if (!isMobile) {
+    setTimeout(() => {
+      const textInput = document.getElementById('textInput');
+      if (textInput) {
+        textInput.focus();
+      }
+    }, 100);
+  }
   
   // 최소 1초 후에 "에디터 사용 가능" 메시지 표시
   setTimeout(() => {
