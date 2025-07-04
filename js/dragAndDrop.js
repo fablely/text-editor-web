@@ -121,8 +121,12 @@ export function initDragAndDrop() {
       state.selectedElement.x = x - state.dragOffset.x;
       state.selectedElement.y = y - state.dragOffset.y;
       
-      // 모달 위치 업데이트 안함 - 드래그 중에는 모달 위치 고정
-      // 텍스트와 스티커 모두 드래그 중에는 모달이 고정됨
+      // 드래그 중에는 모달이 텍스트/스티커를 따라다님
+      if (state.selectedElementType === 'text') {
+        positionModalNearText(state.selectedElement);
+      } else if (state.selectedElementType === 'sticker' && stickerControls && stickerControls.positionModalNearSticker) {
+        stickerControls.positionModalNearSticker(state.selectedElement);
+      }
       
       renderCanvas();
       e.preventDefault();
