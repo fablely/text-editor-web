@@ -357,10 +357,11 @@ class StickerControls {
 
   // SVG 스티커 색상 업데이트 (오프스크린 캔버스 사용)
   updateStickerColor(color) {
-    if (!this.currentSticker || !this.currentSticker.image) return;
+    if (!this.currentSticker || !this.currentSticker.originalImage) return;
 
     const sticker = this.currentSticker;
-    const originalImage = sticker.image;
+    // 항상 원본 이미지를 기반으로 색상을 변경합니다.
+    const originalImage = sticker.originalImage;
 
     // 오프스크린 캔버스 생성
     const offscreenCanvas = document.createElement('canvas');

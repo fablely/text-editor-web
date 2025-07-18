@@ -185,6 +185,7 @@ class StickerLoader {
       width = height * aspectRatio;
     }
     
+    const originalImage = this.selectedSticker.image.cloneNode(true);
     const stickerObject = {
       type: 'sticker',
       id: Date.now(),
@@ -192,7 +193,8 @@ class StickerLoader {
       y: centerY,
       width: width,
       height: height,
-      image: this.selectedSticker.image.cloneNode(true),
+      image: originalImage, // 현재 사용될 이미지
+      originalImage: originalImage, // 색상 변경의 기준이 될 원본 이미지
       rotation: 0,
       opacity: 1,
       name: this.selectedSticker.name,
