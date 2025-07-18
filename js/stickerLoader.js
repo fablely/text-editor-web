@@ -192,7 +192,7 @@ class StickerLoader {
       y: centerY,
       width: width,
       height: height,
-      image: img,
+      image: this.selectedSticker.image.cloneNode(true),
       rotation: 0,
       opacity: 1,
       name: this.selectedSticker.name,
