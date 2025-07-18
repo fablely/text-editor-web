@@ -58,6 +58,11 @@ function renderSticker(sticker) {
   ctx.rotate((sticker.rotation * Math.PI) / 180);
   ctx.globalAlpha = sticker.opacity;
   
+  // CSS filter를 사용한 색상 변경이 적용된 경우
+  if (sticker.colorFilter && sticker.colorFilter.filter) {
+    ctx.filter = sticker.colorFilter.filter;
+  }
+  
   // 스티커 그리기 (중앙 정렬)
   ctx.drawImage(
     sticker.image,
@@ -66,6 +71,9 @@ function renderSticker(sticker) {
     sticker.width,
     sticker.height
   );
+  
+  // filter 초기화
+  ctx.filter = 'none';
   
   // 선택된 스티커에 테두리 효과 적용
   if (sticker === state.selectedElement) {
