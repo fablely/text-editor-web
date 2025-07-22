@@ -11,7 +11,6 @@ class StickerControls {
     this.deleteBtn = null;
     this.closeBtn = null;
     this.currentSticker = null;
-    this.isFollowingSticker = true; // 기본적으로 true, 슬라이더 조정 중에만 false
   }
 
   init() {
@@ -238,7 +237,7 @@ class StickerControls {
     // 슬라이더 조정이 끝난 후 모달이 스티커를 따라다닐 수 있도록 플래그 설정
     this.isFollowingSticker = true;
     
-    console.log('스티커 편집 팝업 표시:', sticker);
+    
   }
 
   positionModalNearSticker(sticker) {
@@ -345,7 +344,7 @@ class StickerControls {
     // 캔버스 다시 렌더링
     renderCanvas();
     
-    console.log('스티커가 삭제되었습니다');
+    
   }
 
   // 외부에서 스티커 선택 해제 시 호출할 수 있는 메서드
@@ -356,24 +355,24 @@ class StickerControls {
   }
 
   // SVG 스티커 색상 업데이트
-  async updateStickerColor(color) {
+  updateStickerColor(color) {
     if (!this.currentSticker) return;
 
     // SVG 스티커가 아닌 경우 처리하지 않음
     if (!this.currentSticker.image || !this.currentSticker.image.src ||
         (!this.currentSticker.image.src.endsWith('.svg') &&
          !this.currentSticker.image.src.includes('data:image/svg+xml'))) {
-      console.log('SVG가 아닌 스티커는 색상 변경이 불가능합니다.');
+      
       return;
     }
 
     try {
       // CSS filter를 사용한 색상 변경
-      console.log('CSS filter를 사용한 색상 변경을 시도합니다...');
+      
       this.currentSticker.colorFilter = this.getColorFilter(color);
       this.currentSticker.currentColor = color; // 현재 색상 저장
       renderCanvas();
-      console.log('CSS filter를 통한 색상 변경 완료:', color);
+      
 
     } catch (error) {
       console.error('SVG 색상 변경 중 오류:', error);
