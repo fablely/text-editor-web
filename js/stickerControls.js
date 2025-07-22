@@ -382,20 +382,9 @@ class StickerControls {
 
   // CSS filter를 사용한 색상 변경 (fallback 방법)
   getColorFilter(targetColor) {
-    // 헥스 색상을 RGB로 변환
-    const hex = targetColor.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16) / 255;
-    const g = parseInt(hex.substr(2, 2), 16) / 255;
-    const b = parseInt(hex.substr(4, 2), 16) / 255;
-    
-    // 색상 필터 조합 생성
-    // 이는 완벽하지 않지만 기본적인 색상 변경 효과를 제공
-    const brightness = Math.max(r, g, b);
-    const hue = this.rgbToHue(r, g, b);
-    const saturation = this.getSaturation(r, g, b);
-    
+    // 모바일 호환성 테스트를 위해 간단한 필터 반환
     return {
-      filter: `hue-rotate(${hue}deg) saturate(${saturation * 100}%) brightness(${brightness * 100}%)`,
+      filter: `grayscale(100%)`,
       targetColor: targetColor
     };
   }

@@ -51,6 +51,11 @@ function renderStickerToCanvas(tempCtx, scaleX, scaleY, stickerElement) {
     
     // 투명도 적용
     tempCtx.globalAlpha = stickerElement.opacity;
+
+    // 색상 필터 적용 (스티커에 colorFilter 속성이 있을 경우)
+    if (stickerElement.colorFilter && stickerElement.colorFilter.filter) {
+      tempCtx.filter = stickerElement.colorFilter.filter;
+    }
     
     // 스케일된 크기로 스티커 그리기 (중심점 기준)
     const scaledWidth = stickerElement.width * scaleX;
@@ -62,6 +67,9 @@ function renderStickerToCanvas(tempCtx, scaleX, scaleY, stickerElement) {
       scaledWidth,
       scaledHeight
     );
+    
+    // filter 초기화
+    tempCtx.filter = 'none';
     
     tempCtx.restore();
   }
