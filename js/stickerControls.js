@@ -11,11 +11,11 @@ class StickerControls {
     this.deleteBtn = null;
     this.closeBtn = null;
     this.currentSticker = null;
+    this.isFollowingSticker = true; // 기본적으로 true, 슬라이더 조정 중에만 false
   }
 
   init() {
     this.popup = document.getElementById('stickerEditPopup');
-    this.colorPicker = document.getElementById('stickerColor'); // 색상 선택기
     this.sizeSlider = document.getElementById('stickerSize');
     this.rotationSlider = document.getElementById('stickerRotation');
     this.opacitySlider = document.getElementById('stickerOpacity');
@@ -56,13 +56,6 @@ class StickerControls {
 
   bindEvents() {
     if (!this.popup) return;
-
-    // 색상 변경 지원
-    if (this.colorPicker) {
-      this.colorPicker.addEventListener('input', (e) => {
-        this.updateStickerColor(e.target.value);
-      });
-    }
 
     // 크기 조정
     this.sizeSlider.addEventListener('mousedown', () => {
@@ -193,32 +186,6 @@ class StickerControls {
     this.rotationSlider.value = currentRotation;
     this.opacitySlider.value = currentOpacity;
 
-    // 색상 선택기 초기화 (SVG 스티커인 경우만)
-    if (this.colorPicker) {
-      const isSvgSticker = sticker.image && sticker.image.src && 
-        (sticker.image.src.endsWith('.svg') || sticker.image.src.includes('data:image/svg+xml'));
-      
-      if (isSvgSticker) {
-        // SVG 스티커인 경우 색상 선택기 표시 및 현재 색상 설정
-        this.colorPicker.style.display = 'block';
-        // 기본 색상을 검은색으로 설정 (실제 SVG에서 색상을 추출하는 것은 복잡하므로)
-        if (sticker.currentColor) {
-          this.colorPicker.value = sticker.currentColor;
-        } else {
-          this.colorPicker.value = '#000000'; // 기본 검은색
-        }
-        
-        // 색상 선택기 라벨 표시
-        const colorLabel = this.colorPicker.parentElement?.querySelector('label');
-        if (colorLabel) colorLabel.style.display = 'block';
-      } else {
-        // PNG 스티커인 경우 색상 선택기 숨김
-        this.colorPicker.style.display = 'none';
-        const colorLabel = this.colorPicker.parentElement?.querySelector('label');
-        if (colorLabel) colorLabel.style.display = 'none';
-      }
-    }
-
     // 수치 표시 초기화
     const stickerSizeValue = document.getElementById('stickerSizeValue');
     const stickerRotationValue = document.getElementById('stickerRotationValue');
@@ -236,8 +203,6 @@ class StickerControls {
     
     // 슬라이더 조정이 끝난 후 모달이 스티커를 따라다닐 수 있도록 플래그 설정
     this.isFollowingSticker = true;
-    
-    
   }
 
   positionModalNearSticker(sticker) {
@@ -343,8 +308,6 @@ class StickerControls {
     
     // 캔버스 다시 렌더링
     renderCanvas();
-    
-    
   }
 
   // 외부에서 스티커 선택 해제 시 호출할 수 있는 메서드
@@ -352,82 +315,6 @@ class StickerControls {
     if (this.currentSticker) {
       this.hidePopup();
     }
-  }
-
-  // SVG 스티커 색상 업데이트
-  updateStickerColor(color) {
-    if (!this.currentSticker) return;
-
-    // SVG 스티커가 아닌 경우 처리하지 않음
-    if (!this.currentSticker.image || !this.currentSticker.image.src ||
-        (!this.currentSticker.image.src.endsWith('.svg') &&
-         !this.currentSticker.image.src.includes('data:image/svg+xml'))) {
-      
-      return;
-    }
-
-    try {
-      // CSS filter를 사용한 색상 변경
-      
-      this.currentSticker.colorFilter = this.getColorFilter(color);
-      this.currentSticker.currentColor = color; // 현재 색상 저장
-      renderCanvas();
-      
-
-    } catch (error) {
-      console.error('SVG 색상 변경 중 오류:', error);
-      alert('색상 변경 중 오류가 발생했습니다. 다시 시도해 주세요.');
-    }
-  }
-
-  // CSS filter를 사용한 색상 변경 (fallback 방법)
-  getColorFilter(targetColor) {
-    // 헥스 색상을 RGB로 변환
-    const hex = targetColor.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16) / 255;
-    const g = parseInt(hex.substr(2, 2), 16) / 255;
-    const b = parseInt(hex.substr(4, 2), 16) / 255;
-    
-    // 색상 필터 조합 생성
-    // 이는 완벽하지 않지만 기본적인 색상 변경 효과를 제공
-    const brightness = Math.max(r, g, b);
-    const hue = this.rgbToHue(r, g, b);
-    const saturation = this.getSaturation(r, g, b);
-    
-    return {
-      filter: `hue-rotate(${hue}deg) saturate(${saturation * 100}%) brightness(${brightness * 100}%)`,
-      targetColor: targetColor
-    };
-  }
-  
-  // RGB를 Hue로 변환
-  rgbToHue(r, g, b) {
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const diff = max - min;
-    
-    if (diff === 0) return 0;
-    
-    let hue = 0;
-    if (max === r) {
-      hue = ((g - b) / diff) % 6;
-    } else if (max === g) {
-      hue = (b - r) / diff + 2;
-    } else {
-      hue = (r - g) / diff + 4;
-    }
-    
-    return Math.round(hue * 60);
-  }
-  
-  // 채도 계산
-  getSaturation(r, g, b) {
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const diff = max - min;
-    
-    if (max === 0) return 0;
-    return diff / max;
   }
 }
 
