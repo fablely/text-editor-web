@@ -6,13 +6,13 @@ import { renderCanvas } from './canvasRenderer.js';
 // 이미지 렌더링을 위한 공통 함수 추출 (코드 중복 제거)
 function renderTextToCanvas(tempCtx, scaleX, scaleY, textElement) {
   tempCtx.save();
-  
+
   // 위치를 원본 비율에 맞게 정확히 변환
   tempCtx.translate(textElement.x * scaleX, textElement.y * scaleY);
-  
+
   tempCtx.rotate((textElement.rotation * Math.PI) / 180);
   tempCtx.globalAlpha = textElement.opacity;
-  
+
   // 폰트 크기도 비율에 맞게 정확히 스케일링
   const fontSize = textElement.size * scaleX; // X축 비율로 통일
   tempCtx.font = `${fontSize}px "${textElement.fontFamily}"`;
@@ -42,13 +42,13 @@ function renderTextToCanvas(tempCtx, scaleX, scaleY, textElement) {
 function renderStickerToCanvas(tempCtx, scaleX, scaleY, stickerElement) {
   if (stickerElement.image && stickerElement.image.complete) {
     tempCtx.save();
-    
+
     // 스티커 중심점으로 이동 (캔버스 렌더링과 동일)
     tempCtx.translate(stickerElement.x * scaleX, stickerElement.y * scaleY);
-    
+
     // 회전 적용
     tempCtx.rotate((stickerElement.rotation * Math.PI) / 180);
-    
+
     // 투명도 적용
     tempCtx.globalAlpha = stickerElement.opacity;
 
@@ -56,21 +56,47 @@ function renderStickerToCanvas(tempCtx, scaleX, scaleY, stickerElement) {
     if (stickerElement.colorFilter && stickerElement.colorFilter.filter) {
       tempCtx.filter = stickerElement.colorFilter.filter;
     }
-    
-    // 스케일된 크기로 스티커 그리기 (중심점 기준)
+
     const scaledWidth = stickerElement.width * scaleX;
     const scaledHeight = stickerElement.height * scaleY;
-    tempCtx.drawImage(
-      stickerElement.image,
-      -scaledWidth / 2,
-      -scaledHeight / 2,
-      scaledWidth,
-      scaledHeight
-    );
-    
+
+    if (stickerElement.color) {
+      // 색상이 지정된 경우 (offscreen canvas를 사용하여 tinting - 원본 해상도 유지)
+      const offscreenCanvas = document.createElement('canvas');
+      offscreenCanvas.width = stickerElement.image.width;
+      offscreenCanvas.height = stickerElement.image.height;
+      const offCtx = offscreenCanvas.getContext('2d');
+
+      // 1. 원본 이미지 그리기
+      offCtx.drawImage(stickerElement.image, 0, 0);
+
+      // 2. 소스 그리기 모드로 색상 입히기
+      offCtx.globalCompositeOperation = 'source-in';
+      offCtx.fillStyle = stickerElement.color;
+      offCtx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+
+      // 3. 틴트된 이미지를 스케일 맞춰 그리기
+      tempCtx.drawImage(
+        offscreenCanvas,
+        -scaledWidth / 2,
+        -scaledHeight / 2,
+        scaledWidth,
+        scaledHeight
+      );
+    } else {
+      // 일반 스티커 그리기
+      tempCtx.drawImage(
+        stickerElement.image,
+        -scaledWidth / 2,
+        -scaledHeight / 2,
+        scaledWidth,
+        scaledHeight
+      );
+    }
+
     // filter 초기화
     tempCtx.filter = 'none';
-    
+
     tempCtx.restore();
   }
 }
@@ -82,13 +108,13 @@ function createTempCanvas() {
   tempCanvas.height = state.originalHeight;
   const tempCtx = tempCanvas.getContext('2d');
   tempCtx.drawImage(state.img, 0, 0, state.originalWidth, state.originalHeight);
-  
+
   const scaleX = state.originalWidth / state.canvasWidth;
   const scaleY = state.originalHeight / state.canvasHeight;
-  
+
   // 모든 요소를 z-index 순서대로 렌더링
   const allElements = getAllElements();
-  
+
   allElements.forEach(item => {
     if (item.type === 'sticker') {
       renderStickerToCanvas(tempCtx, scaleX, scaleY, item.element);
@@ -96,7 +122,7 @@ function createTempCanvas() {
       renderTextToCanvas(tempCtx, scaleX, scaleY, item.element);
     }
   });
-  
+
   return { tempCanvas, scaleX, scaleY };
 }
 
@@ -117,7 +143,7 @@ export function initSaveAndShare() {
     const dataUrl = tempCanvas.toDataURL(mimeType, quality);
 
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     if (isIOS) {
       const downloadWindow = window.open('');
       if (downloadWindow) {
