@@ -220,13 +220,21 @@ export function initModalControls() {
     }
   });
 
-  document.getElementById('modalCloseBtn').addEventListener('click', () => {
+  const closeModal = () => {
     modal.classList.add('hidden');
     state.selectedText = null;
     state.selectedElement = null;
     state.selectedElementType = null;
     renderCanvas();
-  });
+  };
+
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+
+  // 모달 헤더의 × 닫기 버튼 (하단 닫기 버튼과 동일 동작)
+  const headerClose = document.getElementById('modalHeaderClose');
+  if (headerClose) {
+    headerClose.addEventListener('click', closeModal);
+  }
 
   // 이벤트 위임을 사용하여 모달 외부 클릭 처리 최적화
   document.addEventListener('mousedown', e => {

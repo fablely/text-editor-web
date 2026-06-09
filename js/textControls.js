@@ -64,14 +64,45 @@ function focusTextInputMobile(input) {
 
 export function initTextControls() {
   const textInput = document.getElementById('textInput');
+  const clearBtn = document.getElementById('clearTextBtn');
+  const countEl = document.getElementById('textInputCount');
+  const maxLen = parseInt(textInput.getAttribute('maxlength'), 10) || 100;
+
+  // 글자수 표시 + 지우기 버튼 노출 상태 동기화
+  function updateInputState() {
+    const len = textInput.value.length;
+    if (countEl) {
+      countEl.textContent = `${len} / ${maxLen}`;
+      countEl.classList.toggle('limit', len >= maxLen);
+    }
+    if (clearBtn) {
+      clearBtn.classList.toggle('hidden', len === 0);
+    }
+  }
+
+  textInput.addEventListener('input', updateInputState);
+
+  // 지우기(×) 버튼
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      textInput.value = '';
+      updateInputState();
+      focusTextInputMobile(textInput);
+    });
+  }
+
+  updateInputState();
+
+  // 입력 검증 실패 시 흔들림 애니메이션 종료 후 클래스 제거
+  textInput.addEventListener('animationend', () => textInput.classList.remove('shake'));
 
   document.getElementById('addTextBtn').addEventListener('click', () => {
     if (!textInput.value.trim()) {
-      alert('텍스트를 입력해주세요');
-      // 텍스트가 비어있을 때 입력창에 포커스 (모바일 대응)
-      setTimeout(() => {
-        focusTextInputMobile(textInput);
-      }, 100);
+      // 차단형 alert 대신 비차단 시각 피드백(흔들림) + 포커스
+      textInput.classList.remove('shake');
+      void textInput.offsetWidth; // 리플로우로 애니메이션 재시작 보장
+      textInput.classList.add('shake');
+      focusTextInputMobile(textInput);
       return;
     }
 
@@ -101,7 +132,13 @@ export function initTextControls() {
     
     // 텍스트 입력창 비우기
     textInput.value = '';
-    
+    updateInputState();
+
+    // 모바일에서 입력 직후 가상 키보드를 닫아 결과(캔버스)가 바로 보이도록
+    if (isMobile()) {
+      textInput.blur();
+    }
+
     renderCanvas();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     

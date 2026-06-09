@@ -152,8 +152,19 @@
 
       <!-- 텍스트 입력 영역 (기본적으로 표시) -->
       <div id="textInputArea" class="input-area">
-        <input type="text" id="textInput" placeholder="텍스트 입력">
-        <button id="addTextBtn">입력</button>
+        <div class="text-input-row">
+          <div class="text-input-wrap">
+            <input type="text" id="textInput" placeholder="추가할 텍스트를 입력하세요"
+              aria-label="추가할 텍스트" maxlength="100"
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+              enterkeyhint="done">
+            <button id="clearTextBtn" type="button" class="clear-input-btn hidden" aria-label="입력 지우기" tabindex="-1">×</button>
+          </div>
+          <button id="addTextBtn" type="button">입력</button>
+        </div>
+        <div class="input-meta">
+          <span id="textInputCount" class="char-count">0 / 100</span>
+        </div>
       </div>
 
       <!-- 스티커 선택 영역 (기본적으로 숨김) -->
@@ -169,8 +180,14 @@
   <!-- 텍스트 편집용 모달 컨트롤 -->
   <div id="textControlModal" class="text-control-modal hidden">
     <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">텍스트 편집</span>
+        <button id="modalHeaderClose" type="button" class="modal-x" aria-label="닫기">×</button>
+      </div>
       <div class="row">
-        <label>내용 <input type="text" id="modalTextContent" placeholder="텍스트 입력"></label>
+        <label>내용 <input type="text" id="modalTextContent" placeholder="텍스트 입력"
+          aria-label="텍스트 내용" autocomplete="off" autocorrect="off" autocapitalize="off"
+          spellcheck="false" enterkeyhint="done"></label>
       </div>
       <div class="row">
         <label>글꼴
