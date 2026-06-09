@@ -1,0 +1,9 @@
+# Backup files and folders
+back_up/
+*.bak
+
+# Log files
+*.log
+
+# Dependency directories (if any)
+node_modules/
