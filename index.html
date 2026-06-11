@@ -72,44 +72,55 @@
     </div>
   </div>
 
-  <!-- 스티커 편집용 모달 컨트롤 (텍스트 편집 모달과 동일한 구조) -->
+  <!-- 스티커 편집용 모달 컨트롤 (텍스트 편집 모달과 동일한 카드형 구조) -->
   <div id="stickerEditPopup" class="text-control-modal hidden">
     <div class="modal-content">
-      <div class="slider-row">
-        <span class="slider-label">크기</span>
-        <input type="range" id="stickerSize" min="1" max="100" value="50" step="1">
-        <span id="stickerSizeValue" class="slider-value">50</span>
-      </div>
-      <div class="slider-row">
-        <span class="slider-label">불투명도</span>
-        <input type="range" id="stickerOpacity" min="0" max="100" value="100">
-        <span id="stickerOpacityValue" class="slider-value">100</span>
-      </div>
-      <div class="slider-row">
-        <span class="slider-label">회전</span>
-        <input type="range" id="stickerRotation" min="0" max="360" value="0">
-        <span id="stickerRotationValue" class="slider-value">0°</span>
+      <div class="modal-header">
+        <span class="modal-title">스티커 편집</span>
+        <button id="stickerHeaderClose" type="button" class="modal-x" aria-label="닫기">×</button>
       </div>
 
-      <div class="row">
-        <label>색상 <input type="color" id="stickerColorPicker" value="#000000"></label>
-        <button id="resetStickerColorBtn" class="small-button" style="margin-left: 10px;">색상 초기화</button>
-      </div>
-
-      <!-- 레이어 순서 조정 -->
-      <div class="row layer-controls">
-        <span class="slider-label">순서</span>
-        <div class="layer-buttons">
-          <button id="stickerBringToFrontBtn" class="small-button layer-btn" title="맨앞으로">맨앞으로</button>
-          <button id="stickerBringForwardBtn" class="small-button layer-btn" title="앞으로">앞으로</button>
-          <button id="stickerSendBackwardBtn" class="small-button layer-btn" title="뒤로">뒤로</button>
-          <button id="stickerSendToBackBtn" class="small-button layer-btn" title="맨뒤로">맨뒤로</button>
+      <!-- 섹션: 슬라이더 -->
+      <div class="modal-section">
+        <div class="slider-row">
+          <span class="slider-label">크기</span>
+          <input type="range" id="stickerSize" min="1" max="100" value="50" step="1">
+          <span id="stickerSizeValue" class="slider-value">50</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">불투명도</span>
+          <input type="range" id="stickerOpacity" min="0" max="100" value="100">
+          <span id="stickerOpacityValue" class="slider-value">100</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">회전</span>
+          <input type="range" id="stickerRotation" min="0" max="360" value="0">
+          <span id="stickerRotationValue" class="slider-value">0°</span>
         </div>
       </div>
 
-      <div class="row">
-        <button id="deleteStickerBtn" class="small-button">삭제</button>
-        <button id="closeStickerEditBtn" class="small-button">닫기</button>
+      <!-- 섹션: 색상 / 순서 -->
+      <div class="modal-section">
+        <div class="control-row">
+          <span class="slider-label">색상</span>
+          <input type="color" id="stickerColorPicker" value="#000000" class="color-swatch">
+          <button id="resetStickerColorBtn" type="button" class="pill-button">색상 초기화</button>
+        </div>
+        <div class="control-row">
+          <span class="slider-label">순서</span>
+          <div class="order-buttons">
+            <button id="stickerBringToFrontBtn" type="button" class="icon-button" title="맨앞으로" aria-label="맨앞으로">⤒</button>
+            <button id="stickerBringForwardBtn" type="button" class="icon-button" title="앞으로" aria-label="앞으로">↑</button>
+            <button id="stickerSendBackwardBtn" type="button" class="icon-button" title="뒤로" aria-label="뒤로">↓</button>
+            <button id="stickerSendToBackBtn" type="button" class="icon-button" title="맨뒤로" aria-label="맨뒤로">⤓</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 푸터: 삭제 / 완료 -->
+      <div class="modal-footer">
+        <button id="deleteStickerBtn" type="button" class="ghost-danger">삭제</button>
+        <button id="closeStickerEditBtn" type="button" class="primary-button">완료</button>
       </div>
     </div>
   </div>

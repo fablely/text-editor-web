@@ -1874,7 +1874,8 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
   gap: 10px;
   padding-top: 14px;
 }
-.text-control-modal .modal-footer #modalDeleteBtn {
+.text-control-modal .modal-footer #modalDeleteBtn,
+.text-control-modal .modal-footer #deleteStickerBtn {
   min-height: 42px;
   padding: 0 18px;
   font-size: 14px;
@@ -1885,13 +1886,16 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
   border-radius: 12px;
   box-shadow: none;
 }
-.text-control-modal .modal-footer #modalDeleteBtn::before { display: none; }
-.text-control-modal .modal-footer #modalDeleteBtn:hover {
+.text-control-modal .modal-footer #modalDeleteBtn::before,
+.text-control-modal .modal-footer #deleteStickerBtn::before { display: none; }
+.text-control-modal .modal-footer #modalDeleteBtn:hover,
+.text-control-modal .modal-footer #deleteStickerBtn:hover {
   background: rgba(220, 38, 38, 0.14);
   transform: none;
   box-shadow: none;
 }
-.text-control-modal .modal-footer #modalCloseBtn {
+.text-control-modal .modal-footer #modalCloseBtn,
+.text-control-modal .modal-footer #closeStickerEditBtn {
   flex: 1;
   min-height: 42px;
   font-size: 14px;
@@ -1901,11 +1905,22 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
   border: none;
   border-radius: 12px;
 }
-.text-control-modal .modal-footer #modalCloseBtn:hover {
+.text-control-modal .modal-footer #modalCloseBtn:hover,
+.text-control-modal .modal-footer #closeStickerEditBtn:hover {
   color: #fff;
   background: linear-gradient(135deg, #5b6fe0, #6b3f96);
   transform: none;
   box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35);
+}
+
+/* 색상 행: 라벨 + 스와치 + 초기화 pill (스티커 모달) */
+.text-control-modal .control-row input[type="color"] {
+  width: 48px;
+  height: 38px;
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 /* 접근성용 숨김 (방향 select 값 유지) */

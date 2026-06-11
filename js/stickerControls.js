@@ -185,6 +185,14 @@ class StickerControls {
       this.hidePopup();
     });
 
+    // 헤더 × 닫기 버튼 (완료 버튼과 동일 동작)
+    const headerClose = document.getElementById('stickerHeaderClose');
+    if (headerClose) {
+      headerClose.addEventListener('click', () => {
+        this.hidePopup();
+      });
+    }
+
     // 팝업 외부 클릭시 닫기
     this.popup.addEventListener('click', (e) => {
       if (e.target === this.popup) {
@@ -239,8 +247,8 @@ class StickerControls {
     if (!canvas) return;
 
     const canvasRect = canvas.getBoundingClientRect();
-    const modalWidth = 280;
-    const modalHeight = 160;
+    const modalWidth = 300;
+    const modalHeight = 280; // 카드형 리디자인으로 모달이 길어져 추정값 상향
     const padding = 10;
 
     // 캔버스의 실제 디스플레이 크기와 논리적 크기 비율 계산
