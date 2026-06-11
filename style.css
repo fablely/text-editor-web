@@ -1,3 +1,17 @@
+/* ===== 소프트 파스텔 팔레트 ===== */
+:root {
+  --bg-grad: linear-gradient(165deg, #FFF4EC 0%, #FFE8EF 52%, #F1ECFF 100%);
+  --accent: #FF7E9D;        /* 코랄-핑크 (단색: 포커스/값) */
+  --accent-2: #FF9F7E;      /* 피치 (그라데이션 파트너) */
+  --accent-rgb: 255, 126, 157;
+  --mint: #4FD1C5;          /* 보조 액센트(공유 등) */
+  --mint-2: #36BFB1;
+  --ink: #4A4458;           /* 따뜻한 다크 텍스트 */
+  --ink-soft: #8E879C;      /* 흐린 텍스트 */
+  --card: #ffffff;
+  --radius: 22px;
+}
+
 /* 전역 스크롤 제한 */
 html, body {
   overflow-x: hidden;
@@ -55,10 +69,10 @@ html, body {
   }
   
   .feature-btn.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
     color: #ffffff;
-    border-color: rgba(102, 126, 234, 0.8);
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+    border-color: rgba(var(--accent-rgb), 0.8);
+    box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.4);
     font-weight: 700;
     text-shadow: none;
   }
@@ -173,16 +187,17 @@ html {
 body {
     margin: 0;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--bg-grad);
+    background-attachment: fixed;
     min-height: 100vh;
-    color: #1c1c1e;
+    color: var(--ink);
     overflow-x: hidden;
     width: 100%;
     max-width: 100%;
     position: relative;
   }
-  
-  /* 배경 패턴 추가 */
+
+  /* 파스텔 블롭 배경 (코랄·민트·라벤더) */
   body::before {
     content: '';
     position: fixed;
@@ -190,9 +205,10 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
-      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    background-image:
+      radial-gradient(circle at 18% 12%, rgba(255, 158, 126, 0.28) 0%, transparent 42%),
+      radial-gradient(circle at 85% 18%, rgba(255, 126, 157, 0.22) 0%, transparent 40%),
+      radial-gradient(circle at 75% 88%, rgba(79, 209, 197, 0.20) 0%, transparent 45%);
     pointer-events: none;
     z-index: -1;
   }
@@ -268,11 +284,11 @@ body {
   input[type="text"]:focus,
   input[type="number"]:focus,
   select:focus {
-    border-color: #667eea;
+    border-color: var(--accent);
     background: rgba(255, 255, 255, 0.95);
     box-shadow: 
-      0 4px 16px rgba(102, 126, 234, 0.2),
-      0 0 0 4px rgba(102, 126, 234, 0.1);
+      0 4px 16px rgba(var(--accent-rgb), 0.2),
+      0 0 0 4px rgba(var(--accent-rgb), 0.1);
     transform: translateY(-1px);
   }
   
@@ -313,7 +329,7 @@ body {
     height: 20px;
     width: 20px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
     cursor: pointer;
     border: 3px solid white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -322,7 +338,7 @@ body {
   
   input[type="range"]::-webkit-slider-thumb:hover {
     transform: scale(1.2);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.4);
   }
   
   input[type="range"]::-moz-range-track {
@@ -336,7 +352,7 @@ body {
     height: 20px;
     width: 20px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
     cursor: pointer;
     border: 3px solid white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -348,7 +364,7 @@ body {
   .upload-button {
     display: inline-block;
     padding: 16px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
     color: white;
     font-size: 14px;
     font-weight: 600;
@@ -358,7 +374,7 @@ body {
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.3);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
   
@@ -379,7 +395,7 @@ body {
   
   .upload-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.4);
   }
   
   .upload-button input[type="file"] {
@@ -394,7 +410,7 @@ body {
   
   /* 버튼 */
   button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
     color: #fff;
     font-weight: 600;
     font-size: 16px;
@@ -404,7 +420,7 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 
-      0 4px 16px rgba(102, 126, 234, 0.3),
+      0 4px 16px rgba(var(--accent-rgb), 0.3),
       0 0 0 1px rgba(255, 255, 255, 0.1);
     position: relative;
     overflow: hidden;
@@ -428,14 +444,14 @@ body {
   button:hover {
     transform: translateY(-2px);
     box-shadow: 
-      0 4px 16px rgba(102, 126, 234, 0.3),
+      0 4px 16px rgba(var(--accent-rgb), 0.3),
       0 0 0 1px rgba(255, 255, 255, 0.3);
   }
   
   button:active {
     transform: translateY(0);
     box-shadow: 
-      0 2px 8px rgba(102, 126, 234, 0.3),
+      0 2px 8px rgba(var(--accent-rgb), 0.3),
       0 0 0 1px rgba(255, 255, 255, 0.1);
   }
   
@@ -631,7 +647,7 @@ body {
   }
   
   .popup-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
     color: white;
     padding: 14px 28px;
     border: none;
@@ -640,12 +656,12 @@ body {
     font-size: 16px;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.3);
   }
   
   .popup-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.4);
   }
   
   /* 스티커 선택 모달 스타일 */
@@ -685,13 +701,13 @@ body {
   }
   
   .sticker-picker-content .sticker-item:hover {
-    border-color: #667eea;
+    border-color: var(--accent);
     background: rgba(255, 255, 255, 1);
   }
   
   .sticker-picker-content .sticker-item.selected {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
+    border-color: var(--accent);
+    background: rgba(var(--accent-rgb), 0.1);
   }
   
   .modal-buttons {
@@ -778,7 +794,7 @@ body {
     /* 모바일 포커스 개선 */
     -webkit-user-select: text;
     user-select: text;
-    -webkit-tap-highlight-color: rgba(102, 126, 234, 0.3);
+    -webkit-tap-highlight-color: rgba(var(--accent-rgb), 0.3);
     touch-action: manipulation;
   }
   
@@ -836,11 +852,11 @@ body {
     min-width: 45px;
     text-align: center;
     font-weight: 600;
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
+    color: var(--accent);
+    background: rgba(var(--accent-rgb), 0.1);
     padding: 4px 8px;
     border-radius: 8px;
-    border: 1px solid rgba(102, 126, 234, 0.2);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
   }
   
   .text-control-modal .small-button {
@@ -947,7 +963,7 @@ body {
     justify-content: center;
     gap: 12px;
     background: rgba(255, 255, 255, 0.9);
-    color: #667eea;
+    color: var(--accent);
     text-decoration: none;
     font-weight: 600;
     font-size: 16px;
@@ -1139,14 +1155,14 @@ select:disabled, input:disabled {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .picker-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
   border: none;
   color: white;
   font-size: 14px;
@@ -1269,7 +1285,7 @@ select:disabled, input:disabled {
 }
 
 .font-option.selected {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
   color: white;
   font-weight: 600;
   box-shadow: 
@@ -1441,11 +1457,11 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
   min-width: 45px;
   text-align: center;
   font-weight: 600;
-  color: #667eea;
-  background: rgba(102, 126, 234, 0.1);
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.1);
   padding: 4px 8px;
   border-radius: 8px;
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
 }
 
 /* 모바일에서 순서 조정 버튼 최적화 */
@@ -1515,8 +1531,8 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
   }
   
   #textInput:focus {
-    border-color: #667eea !important;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.25) !important;
     outline: none !important;
     background: rgba(255, 255, 255, 1) !important;
   }
@@ -1745,7 +1761,7 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
 }
 .text-control-modal .font-selector:hover {
   background: #fff;
-  border-color: rgba(102, 126, 234, 0.5);
+  border-color: rgba(var(--accent-rgb), 0.5);
 }
 .text-control-modal .font-selector #modalFontDisplay {
   overflow: hidden;
@@ -1835,7 +1851,7 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
 .text-control-modal .pill-button::before { display: none; }
 .text-control-modal .pill-button:hover {
   background: #fff;
-  border-color: rgba(102, 126, 234, 0.5);
+  border-color: rgba(var(--accent-rgb), 0.5);
   transform: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -1861,7 +1877,7 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
 .text-control-modal .order-buttons .icon-button::before { display: none; }
 .text-control-modal .order-buttons .icon-button:hover {
   background: #eef2ff;
-  border-color: rgba(102, 126, 234, 0.5);
+  border-color: rgba(var(--accent-rgb), 0.5);
   color: #4f46e5;
   transform: none;
   box-shadow: none;
@@ -1901,16 +1917,16 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
   font-size: 14px;
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   border: none;
   border-radius: 12px;
 }
 .text-control-modal .modal-footer #modalCloseBtn:hover,
 .text-control-modal .modal-footer #closeStickerEditBtn:hover {
   color: #fff;
-  background: linear-gradient(135deg, #5b6fe0, #6b3f96);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   transform: none;
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35);
+  box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.35);
 }
 
 /* 색상 행: 라벨 + 스와치 + 초기화 pill (스티커 모달) */
@@ -1934,4 +1950,129 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
   clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* ===================================================== */
+/* ===== 소프트 파스텔 테마 마감 (전역 오버라이드) ===== */
+/* ===================================================== */
+
+/* 앱 헤더 */
+.app-header {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 18px;
+}
+.app-title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(120deg, var(--accent) 0%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--accent);
+}
+.app-title .title-mark {
+  -webkit-text-fill-color: var(--accent);
+}
+.app-subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+/* 컨트롤 카드 */
+.controls {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 44px rgba(255, 126, 157, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* 모드 탭 컨테이너 */
+.feature-buttons {
+  background: rgba(255, 240, 243, 0.7);
+  border-radius: 18px;
+}
+
+/* 업로드 버튼 */
+.upload-button {
+  border-radius: var(--radius);
+  box-shadow: 0 10px 26px rgba(var(--accent-rgb), 0.32);
+}
+.upload-icon { font-size: 18px; }
+
+/* 버튼/입력 라운드 통일 */
+button,
+.feature-btn,
+.popup-button {
+  border-radius: 16px;
+}
+
+/* 저장/공유 액션 */
+#saveImageBtn,
+#shareImageBtn {
+  min-height: 50px;
+  font-size: 16px;
+  border-radius: 16px;
+}
+/* 공유 = 민트 보조색 */
+#shareImageBtn {
+  background: linear-gradient(135deg, var(--mint) 0%, var(--mint-2) 100%);
+  box-shadow: 0 8px 22px rgba(79, 209, 197, 0.32);
+}
+#shareImageBtn:hover {
+  box-shadow: 0 12px 28px rgba(79, 209, 197, 0.42);
+}
+
+/* 캔버스를 폴라로이드 카드처럼 */
+.canvas-wrapper {
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 16px 44px rgba(255, 126, 157, 0.14);
+}
+.canvas-placeholder {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+canvas {
+  border-radius: 16px;
+  border: 4px solid #ffffff;
+}
+
+/* 팝업 오버레이를 파스텔 스크림으로 */
+.popup-overlay {
+  background: rgba(74, 68, 88, 0.42);
+}
+.popup-content {
+  border-radius: var(--radius);
+}
+
+/* 토스트를 브랜드 코랄로 */
+#fontLoadStatus {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  box-shadow: 0 12px 32px rgba(var(--accent-rgb), 0.4);
+}
+
+/* 푸터: 밝은 배경에서 가독성 보정 */
+.fablely-footer {
+  background: rgba(255, 255, 255, 0.45);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+}
+.copyright {
+  color: var(--ink-soft);
+}
+.footer-button {
+  color: var(--accent);
+  box-shadow: 0 8px 22px rgba(var(--accent-rgb), 0.14);
+}
+
+/* 글자수 카운터: 밝은 카드 위라 가독성 보정 */
+.char-count {
+  color: var(--ink-soft);
+}
+.char-count.limit {
+  color: var(--accent);
 }
