@@ -2,43 +2,42 @@
 // 폰트는 시작 시 전부 받지 않고, 실제로 필요할 때(미리보기/선택/저장 직전) 1회만 로드합니다.
 import { warn, error } from './logger.js';
 
-export const fontFiles = [
-  '강원교육모두.ttf',
-  '강원교육새음.ttf',
-  '강원교육현옥샘.ttf',
-  '더페이스샵.ttf',
-  '마포꽃섬.ttf',
-  '바른히피.ttf',
-  '배달의민족도현체.ttf',
-  '배달의민족연성체.ttf',
-  '배달의민족을지로체.ttf',
-  '배달의민족주아체.ttf',
-  '배달의민족한나체Air.ttf',
-  '배달의민족한나체Pro.ttf',
-  '빙그레싸만코.ttf',
-  '상상토끼꽃길.ttf',
-  '평창평화체.ttf',
-  '학교안심여행.ttf',
-  '학교안심우산.ttf',
-  '학교안심우주.ttf'
+// 커스텀 폰트 이름 목록 (캔버스 fontFamily == Fonts/<이름>.woff2)
+export const fontNames = [
+  '강원교육모두',
+  '강원교육새음',
+  '강원교육현옥샘',
+  '더페이스샵',
+  '마포꽃섬',
+  '바른히피',
+  '배달의민족도현체',
+  '배달의민족연성체',
+  '배달의민족을지로체',
+  '배달의민족주아체',
+  '배달의민족한나체Air',
+  '배달의민족한나체Pro',
+  '빙그레싸만코',
+  '상상토끼꽃길',
+  '평창평화체',
+  '학교안심여행',
+  '학교안심우산',
+  '학교안심우주'
 ];
 
-// 캔버스에서 사용하는 fontFamily 이름( = 확장자 뺀 파일명) → 실제 파일명
-const fontFileByName = new Map(
-  fontFiles.map(file => [file.replace(/\.[^.]+$/, ''), file])
-);
+// 커스텀 폰트 이름 집합 (멤버십 조회용)
+const customFontSet = new Set(fontNames);
 
 // 이름별 로드 Promise 캐시 (중복 네트워크 요청 방지)
 const loadingCache = new Map();
 
 // 해당 이름이 별도 다운로드가 필요한 커스텀 폰트인지 여부
 export function isCustomFont(name) {
-  return fontFileByName.has(name);
+  return customFontSet.has(name);
 }
 
 // 폰트 한 개를 보장 로드. 기본/구글 폰트는 즉시 통과.
 export function ensureFontLoaded(name) {
-  if (!name || !fontFileByName.has(name)) {
+  if (!name || !customFontSet.has(name)) {
     // 'sans-serif', 'Inter, sans-serif' 등은 받을 필요 없음
     return Promise.resolve(true);
   }
