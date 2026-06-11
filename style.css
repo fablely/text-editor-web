@@ -2116,7 +2116,7 @@ canvas {
     top: auto !important;
     width: 100% !important;
     max-width: 100% !important;
-    max-height: 72vh;
+    max-height: 38vh; /* 화면의 약 1/3만 차지 → 사진이 보이도록 */
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     border-radius: 24px 24px 0 0;
