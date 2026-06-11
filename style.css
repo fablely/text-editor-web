@@ -1685,3 +1685,238 @@ input, select, textarea, button, .modal-content, .font-picker-modal {
   transform: none;
   box-shadow: none;
 }
+
+/* ===== 텍스트 편집 모달: 카드형 리디자인 ===== */
+
+/* 섹션 구분선 */
+.text-control-modal .modal-section {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+.text-control-modal .modal-section:first-of-type {
+  padding-top: 4px;
+}
+.text-control-modal .modal-section:last-of-type {
+  border-bottom: none;
+}
+
+/* 필드 (라벨 위 + 컨트롤 아래) */
+.text-control-modal .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.text-control-modal .field-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+  margin-top: 12px;
+}
+.text-control-modal .field-font {
+  min-width: 0;
+}
+.text-control-modal .field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+.text-control-modal .field-input {
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+/* 글꼴 선택기를 드롭다운처럼 */
+.text-control-modal .font-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 44px;
+  padding: 0 14px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+.text-control-modal .font-selector:hover {
+  background: #fff;
+  border-color: rgba(102, 126, 234, 0.5);
+}
+.text-control-modal .font-selector #modalFontDisplay {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.text-control-modal .font-selector .selector-arrow {
+  color: #9ca3af;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* 색상 스와치 */
+.text-control-modal .field-color {
+  align-items: flex-start;
+}
+.text-control-modal .field-color input[type="color"] {
+  width: 44px;
+  height: 44px;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* 방향/정렬/순서 행 */
+.text-control-modal .control-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.text-control-modal .control-row + .control-row {
+  margin-top: 10px;
+}
+.text-control-modal .control-row .slider-label {
+  min-width: 50px;
+}
+
+/* 세그먼트 토글 (가로/세로) */
+.text-control-modal .segmented {
+  display: inline-flex;
+  flex: 1;
+  gap: 3px;
+  padding: 3px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+}
+.text-control-modal .segmented .seg-btn {
+  flex: 1;
+  min-height: 34px;
+  padding: 6px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  box-shadow: none;
+  cursor: pointer;
+}
+.text-control-modal .segmented .seg-btn::before { display: none; }
+.text-control-modal .segmented .seg-btn.active {
+  color: #4f46e5;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+.text-control-modal .segmented .seg-btn:hover {
+  transform: none;
+  box-shadow: none;
+}
+.text-control-modal .segmented .seg-btn.active:hover {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* 정렬 pill */
+.text-control-modal .pill-button {
+  flex: 1;
+  min-height: 38px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: none;
+  cursor: pointer;
+}
+.text-control-modal .pill-button::before { display: none; }
+.text-control-modal .pill-button:hover {
+  background: #fff;
+  border-color: rgba(102, 126, 234, 0.5);
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 순서 아이콘 버튼 */
+.text-control-modal .order-buttons {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+}
+.text-control-modal .order-buttons .icon-button {
+  flex: 1;
+  min-height: 38px;
+  padding: 0;
+  font-size: 16px;
+  color: #374151;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: none;
+  cursor: pointer;
+}
+.text-control-modal .order-buttons .icon-button::before { display: none; }
+.text-control-modal .order-buttons .icon-button:hover {
+  background: #eef2ff;
+  border-color: rgba(102, 126, 234, 0.5);
+  color: #4f46e5;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 푸터: 삭제(고스트) + 완료(메인) — ID 셀렉터로 기존 스타일을 덮어씀 */
+.text-control-modal .modal-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 14px;
+}
+.text-control-modal .modal-footer #modalDeleteBtn {
+  min-height: 42px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 12px;
+  box-shadow: none;
+}
+.text-control-modal .modal-footer #modalDeleteBtn::before { display: none; }
+.text-control-modal .modal-footer #modalDeleteBtn:hover {
+  background: rgba(220, 38, 38, 0.14);
+  transform: none;
+  box-shadow: none;
+}
+.text-control-modal .modal-footer #modalCloseBtn {
+  flex: 1;
+  min-height: 42px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 12px;
+}
+.text-control-modal .modal-footer #modalCloseBtn:hover {
+  color: #fff;
+  background: linear-gradient(135deg, #5b6fe0, #6b3f96);
+  transform: none;
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35);
+}
+
+/* 접근성용 숨김 (방향 select 값 유지) */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

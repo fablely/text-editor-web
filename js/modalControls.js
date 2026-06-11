@@ -178,6 +178,19 @@ export function initModalControls() {
     });
   }
 
+  // 방향 세그먼트 토글(가로/세로) — 숨겨진 select를 갱신하고 change 이벤트로 위 로직 재사용
+  const directionSeg = document.getElementById('modalDirectionSeg');
+  if (directionSeg && modalDirectionInput) {
+    const segButtons = directionSeg.querySelectorAll('.seg-btn');
+    segButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modalDirectionInput.value = btn.dataset.dir;
+        modalDirectionInput.dispatchEvent(new Event('change', { bubbles: true }));
+        segButtons.forEach(b => b.classList.toggle('active', b === btn));
+      });
+    });
+  }
+
   // 특수 버튼 이벤트 처리
   document.getElementById('modalCenterBtn').addEventListener('click', () => {
     const t = state.selectedText;

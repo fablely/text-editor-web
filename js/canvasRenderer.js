@@ -289,8 +289,8 @@ export function resizeCanvas(newWidth, newHeight) {
 
 export function positionModalNearText(textObj) {
   const canvasRect = state.canvas.getBoundingClientRect();
-  const modalWidth = 280;
-  const modalHeight = 160;
+  const modalWidth = 300;
+  const modalHeight = 320; // 카드형 리디자인으로 모달이 길어져 추정값 상향(뷰포트 밖 클리핑 방지)
   const padding = 10;
 
   // 캔버스의 실제 크기와 논리적 크기 비율 계산
@@ -390,7 +390,16 @@ export function updateModalControls(textObj) {
   document.getElementById('modalLetterSpacingValue').textContent = textObj.letterSpacing || 0;
   document.getElementById('modalRotation').value = textObj.rotation || 0;
   document.getElementById('modalRotationValue').textContent = `${textObj.rotation || 0}°`;
-  document.getElementById('modalTextDirection').value = textObj.direction || 'horizontal';
+  const direction = textObj.direction || 'horizontal';
+  document.getElementById('modalTextDirection').value = direction;
+
+  // 방향 세그먼트 토글 활성 상태 동기화
+  const directionSeg = document.getElementById('modalDirectionSeg');
+  if (directionSeg) {
+    directionSeg.querySelectorAll('.seg-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.dir === direction);
+    });
+  }
 }
 
 // 위치에서 텍스트 찾기 (z-index 순서 고려)

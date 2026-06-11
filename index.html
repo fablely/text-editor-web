@@ -184,69 +184,86 @@
         <span class="modal-title">텍스트 편집</span>
         <button id="modalHeaderClose" type="button" class="modal-x" aria-label="닫기">×</button>
       </div>
-      <div class="row">
-        <label>내용 <input type="text" id="modalTextContent" placeholder="텍스트 입력"
-          aria-label="텍스트 내용" autocomplete="off" autocorrect="off" autocapitalize="off"
-          spellcheck="false" enterkeyhint="done"></label>
-      </div>
-      <div class="row">
-        <label>글꼴
-          <div id="modalFontSelector" class="font-selector">
-            <span id="modalFontDisplay"></span>
-            <input type="hidden" id="modalFontFamily">
-            <span class="selector-arrow">▼</span>
+      <!-- 섹션: 내용 / 글꼴 / 색상 -->
+      <div class="modal-section">
+        <div class="field">
+          <span class="field-label">내용</span>
+          <input type="text" id="modalTextContent" class="field-input" placeholder="텍스트 입력"
+            aria-label="텍스트 내용" autocomplete="off" autocorrect="off" autocapitalize="off"
+            spellcheck="false" enterkeyhint="done">
+        </div>
+        <div class="field-grid">
+          <div class="field field-font">
+            <span class="field-label">글꼴</span>
+            <div id="modalFontSelector" class="font-selector">
+              <span id="modalFontDisplay"></span>
+              <input type="hidden" id="modalFontFamily">
+              <span class="selector-arrow">▾</span>
+            </div>
           </div>
-        </label>
-      </div>
-      <div class="row">
-        <label>색상 <input type="color" id="modalFontColor"></label>
-      </div>
-      <div class="slider-row">
-        <span class="slider-label">크기</span>
-        <input type="range" id="modalFontSize" min="10" max="200">
-        <span id="modalFontSizeValue" class="slider-value">50</span>
-      </div>
-      <div class="slider-row">
-        <span class="slider-label">불투명도</span>
-        <input type="range" id="modalOpacity" min="0" max="1" step="0.1" value="1">
-        <span id="modalOpacityValue" class="slider-value">1.0</span>
-      </div>
-      <div class="slider-row">
-        <span class="slider-label">자간</span>
-        <input type="range" id="modalLetterSpacing" min="-5" max="20" step="0.5" value="0">
-        <span id="modalLetterSpacingValue" class="slider-value">0</span>
-      </div>
-      <div class="slider-row">
-        <span class="slider-label">회전</span>
-        <input type="range" id="modalRotation" min="-180" max="180" value="0" step="1">
-        <span id="modalRotationValue" class="slider-value">0°</span>
-      </div>
-      <div class="row">
-        <label>방향
-          <select id="modalTextDirection">
-            <option value="horizontal">가로</option>
-            <option value="vertical">세로</option>
-          </select>
-        </label>
-      </div>
-      <div class="row">
-        <label>정렬 <button id="modalCenterBtn" class="small-button">중앙</button></label>
-      </div>
-
-      <!-- 레이어 순서 조정 -->
-      <div class="row layer-controls">
-        <span class="slider-label">순서</span>
-        <div class="layer-buttons">
-          <button id="modalBringToFrontBtn" class="small-button layer-btn" title="맨앞으로">맨앞으로</button>
-          <button id="modalBringForwardBtn" class="small-button layer-btn" title="앞으로">앞으로</button>
-          <button id="modalSendBackwardBtn" class="small-button layer-btn" title="뒤로">뒤로</button>
-          <button id="modalSendToBackBtn" class="small-button layer-btn" title="맨뒤로">맨뒤로</button>
+          <div class="field field-color">
+            <span class="field-label">색상</span>
+            <input type="color" id="modalFontColor">
+          </div>
         </div>
       </div>
 
-      <div class="row">
-        <button id="modalDeleteBtn" class="small-button">삭제</button>
-        <button id="modalCloseBtn" class="small-button">닫기</button>
+      <!-- 섹션: 슬라이더 -->
+      <div class="modal-section">
+        <div class="slider-row">
+          <span class="slider-label">크기</span>
+          <input type="range" id="modalFontSize" min="10" max="200">
+          <span id="modalFontSizeValue" class="slider-value">50</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">불투명도</span>
+          <input type="range" id="modalOpacity" min="0" max="1" step="0.1" value="1">
+          <span id="modalOpacityValue" class="slider-value">1.0</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">자간</span>
+          <input type="range" id="modalLetterSpacing" min="-5" max="20" step="0.5" value="0">
+          <span id="modalLetterSpacingValue" class="slider-value">0</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">회전</span>
+          <input type="range" id="modalRotation" min="-180" max="180" value="0" step="1">
+          <span id="modalRotationValue" class="slider-value">0°</span>
+        </div>
+      </div>
+
+      <!-- 섹션: 방향 / 정렬 / 순서 -->
+      <div class="modal-section">
+        <div class="control-row">
+          <span class="slider-label">방향</span>
+          <div class="segmented" id="modalDirectionSeg">
+            <button type="button" class="seg-btn" data-dir="horizontal">가로</button>
+            <button type="button" class="seg-btn" data-dir="vertical">세로</button>
+          </div>
+          <select id="modalTextDirection" class="visually-hidden" tabindex="-1" aria-hidden="true">
+            <option value="horizontal">가로</option>
+            <option value="vertical">세로</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <span class="slider-label">정렬</span>
+          <button id="modalCenterBtn" type="button" class="pill-button">가운데</button>
+        </div>
+        <div class="control-row">
+          <span class="slider-label">순서</span>
+          <div class="order-buttons">
+            <button id="modalBringToFrontBtn" type="button" class="icon-button" title="맨앞으로" aria-label="맨앞으로">⤒</button>
+            <button id="modalBringForwardBtn" type="button" class="icon-button" title="앞으로" aria-label="앞으로">↑</button>
+            <button id="modalSendBackwardBtn" type="button" class="icon-button" title="뒤로" aria-label="뒤로">↓</button>
+            <button id="modalSendToBackBtn" type="button" class="icon-button" title="맨뒤로" aria-label="맨뒤로">⤓</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 푸터: 삭제 / 완료 -->
+      <div class="modal-footer">
+        <button id="modalDeleteBtn" type="button" class="ghost-danger">삭제</button>
+        <button id="modalCloseBtn" type="button" class="primary-button">완료</button>
       </div>
     </div>
   </div>
