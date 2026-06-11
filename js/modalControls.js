@@ -1,10 +1,14 @@
 // js/modalControls.js
 import { state } from './state.js';
 import { renderCanvas, positionModalNearText } from './canvasRenderer.js';
+import { pushHistory } from './history.js';
 import { warn } from './logger.js';
 
 export function initModalControls() {
   const modal = document.getElementById('textControlModal');
+
+  // 슬라이더/색상/내용/방향 등 값 확정(change) 시 히스토리 적재
+  modal.addEventListener('change', () => pushHistory());
   
   // 모든 입력 요소를 효율적으로 처리하기 위한 설정
   const controlConfigs = [
@@ -15,6 +19,8 @@ export function initModalControls() {
     { id: 'modalOpacity', prop: 'opacity', event: 'input', parser: v => parseFloat(v), valueId: 'modalOpacityValue', format: v => v.toFixed(1) },
     { id: 'modalLetterSpacing', prop: 'letterSpacing', event: 'input', parser: v => parseFloat(v), valueId: 'modalLetterSpacingValue', format: v => v.toFixed(1) },
     { id: 'modalRotation', prop: 'rotation', event: 'input', parser: v => parseFloat(v), valueId: 'modalRotationValue', format: v => v + '°' },
+    { id: 'modalStrokeWidth', prop: 'strokeWidth', event: 'input', parser: v => parseFloat(v), valueId: 'modalStrokeWidthValue' },
+    { id: 'modalStrokeColor', prop: 'strokeColor', event: 'input', parser: v => v },
     { id: 'modalTextDirection', prop: 'direction', event: 'change', parser: v => v } // change 이벤트 사용
   ];
   
@@ -191,6 +197,18 @@ export function initModalControls() {
     });
   }
 
+  // 그림자 토글 버튼
+  const shadowBtn = document.getElementById('modalShadowBtn');
+  if (shadowBtn) {
+    shadowBtn.addEventListener('click', () => {
+      if (!state.selectedText) return;
+      state.selectedText.shadow = !state.selectedText.shadow;
+      shadowBtn.classList.toggle('active', state.selectedText.shadow);
+      renderCanvas();
+      pushHistory();
+    });
+  }
+
   // 특수 버튼 이벤트 처리
   document.getElementById('modalCenterBtn').addEventListener('click', () => {
     const t = state.selectedText;
@@ -214,6 +232,7 @@ export function initModalControls() {
       t.x = Math.round(state.canvasWidth / 2 - textWidth / 2);
       renderCanvas();
       positionModalNearText(t);
+      pushHistory();
     }
   });
 
@@ -230,6 +249,7 @@ export function initModalControls() {
       state.selectedElementType = null;
       modal.classList.add('hidden');
       renderCanvas();
+      pushHistory();
     }
   });
 

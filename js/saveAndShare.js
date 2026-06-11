@@ -1,7 +1,7 @@
 // js/saveAndShare.js
 import { state } from './state.js';
 import { getAllElements } from './utils.js';
-import { renderCanvas } from './canvasRenderer.js';
+import { renderCanvas, paintText } from './canvasRenderer.js';
 import { ensureFontsLoaded } from './fontLoader.js';
 
 // 이미지 렌더링을 위한 공통 함수 추출 (코드 중복 제거)
@@ -21,19 +21,27 @@ function renderTextToCanvas(tempCtx, scaleX, scaleY, textElement) {
   tempCtx.textBaseline = 'top';
 
   const scaledSpacing = (textElement.letterSpacing || 0) * scaleX;
+  const opts = {
+    fontSize,
+    fillStyle: textElement.color,
+    strokeWidth: (textElement.strokeWidth || 0) * scaleX,
+    strokeColor: textElement.strokeColor || '#000000',
+    shadow: !!textElement.shadow
+  };
+
   if (textElement.direction === 'vertical') {
     for (let i = 0; i < textElement.text.length; i++) {
-      tempCtx.fillText(textElement.text[i], 0, i * (fontSize + scaledSpacing));
+      paintText(tempCtx, textElement.text[i], 0, i * (fontSize + scaledSpacing), opts);
     }
   } else {
     if (scaledSpacing) {
       let xPos = 0;
       for (let i = 0; i < textElement.text.length; i++) {
-        tempCtx.fillText(textElement.text[i], xPos, 0);
+        paintText(tempCtx, textElement.text[i], xPos, 0, opts);
         xPos += tempCtx.measureText(textElement.text[i]).width + scaledSpacing;
       }
     } else {
-      tempCtx.fillText(textElement.text, 0, 0);
+      paintText(tempCtx, textElement.text, 0, 0, opts);
     }
   }
   tempCtx.restore();
@@ -98,15 +106,30 @@ function renderStickerToCanvas(tempCtx, scaleX, scaleY, stickerElement) {
 }
 
 // 공통 캔버스 생성 함수
-function createTempCanvas() {
-  const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = state.originalWidth;
-  tempCanvas.height = state.originalHeight;
-  const tempCtx = tempCanvas.getContext('2d');
-  tempCtx.drawImage(state.img, 0, 0, state.originalWidth, state.originalHeight);
+// 모바일 메모리 보호를 위해 출력 캔버스의 긴 변을 MAX_EXPORT_PX로 제한한다.
+const MAX_EXPORT_PX = 4096;
 
-  const scaleX = state.originalWidth / state.canvasWidth;
-  const scaleY = state.originalHeight / state.canvasHeight;
+function createTempCanvas() {
+  let outW = state.originalWidth;
+  let outH = state.originalHeight;
+  const longest = Math.max(outW, outH);
+  if (longest > MAX_EXPORT_PX) {
+    const r = MAX_EXPORT_PX / longest;
+    outW = Math.round(outW * r);
+    outH = Math.round(outH * r);
+  }
+
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = outW;
+  tempCanvas.height = outH;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.imageSmoothingEnabled = true;
+  tempCtx.imageSmoothingQuality = 'high';
+  tempCtx.drawImage(state.img, 0, 0, outW, outH);
+
+  // 표시 캔버스 좌표 → 출력 캔버스 좌표 비율
+  const scaleX = outW / state.canvasWidth;
+  const scaleY = outH / state.canvasHeight;
 
   // 모든 요소를 z-index 순서대로 렌더링
   const allElements = getAllElements();

@@ -1,6 +1,8 @@
 // 스티커 컨트롤 모듈
 import { state } from './state.js';
 import { renderCanvas } from './canvasRenderer.js';
+import { isMobile } from './utils.js';
+import { pushHistory } from './history.js';
 
 class StickerControls {
   constructor() {
@@ -58,6 +60,9 @@ class StickerControls {
 
   bindEvents() {
     if (!this.popup) return;
+
+    // 슬라이더/색상 값 확정(change) 시 히스토리 적재
+    this.popup.addEventListener('change', () => pushHistory());
 
     // 크기 조정
     this.sizeSlider.addEventListener('mousedown', () => {
@@ -161,6 +166,7 @@ class StickerControls {
         // 색상 피커도 기본값(검정)으로 리셋하지만, 실제로는 적용 안됨 상태임
         if (this.colorPicker) this.colorPicker.value = '#000000';
         renderCanvas();
+        pushHistory();
       });
     }
 
@@ -242,6 +248,15 @@ class StickerControls {
 
   positionModalNearSticker(sticker) {
     if (!this.popup || !sticker) return;
+
+    // 모바일: 하단 시트로 고정 (CSS가 위치 담당)
+    if (isMobile()) {
+      this.popup.style.position = '';
+      this.popup.style.left = '';
+      this.popup.style.top = '';
+      this.popup.style.transform = '';
+      return;
+    }
 
     const canvas = document.getElementById('canvas');
     if (!canvas) return;
@@ -343,6 +358,7 @@ class StickerControls {
 
     // 캔버스 다시 렌더링
     renderCanvas();
+    pushHistory();
   }
 
   // 외부에서 스티커 선택 해제 시 호출할 수 있는 메서드

@@ -2,6 +2,7 @@
 import { state } from './state.js';
 import { getNextZIndex } from './utils.js';
 import { renderCanvas } from './canvasRenderer.js';
+import { pushHistory } from './history.js';
 import { log, warn, error } from './logger.js';
 
 // 매니페스트 로드 실패 시 사용할 기본 목록
@@ -198,7 +199,8 @@ class StickerLoader {
     
     // 캔버스 다시 렌더링
     renderCanvas();
-    
+    pushHistory();
+
     // 모달 닫기
     this.hideStickerPicker();
     

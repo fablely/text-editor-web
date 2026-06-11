@@ -10,6 +10,7 @@ import { stickerLoader } from './stickerLoader.js';
 import { stickerControls } from './stickerControls.js';
 import { modeControls } from './modeControls.js';
 import { initLayerControls } from './layerControls.js';
+import { initHistory } from './history.js';
 import { isMobile } from './utils.js';
 import { log } from './logger.js';
 
@@ -51,6 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await stickerLoader.init();
   stickerControls.init();
   initLayerControls();
+  initHistory();
 
   // 모바일에서 사용자 상호작용 후 텍스트 입력 활성화
   if (mobile) {

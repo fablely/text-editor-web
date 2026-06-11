@@ -1,6 +1,7 @@
 // js/imageLoader.js
 import { state } from './state.js';
 import { renderCanvas } from './canvasRenderer.js';
+import { resetHistory } from './history.js';
 import { log } from './logger.js';
 
 // 새 이미지를 올릴 때 이전 편집 요소/선택 상태를 초기화
@@ -18,6 +19,9 @@ function resetEditorState() {
     const el = document.getElementById(id);
     if (el) el.classList.add('hidden');
   });
+
+  // 새 이미지이므로 실행취소 히스토리도 초기화
+  resetHistory();
 }
 
 export function initImageLoader() {

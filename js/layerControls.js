@@ -2,6 +2,7 @@
 import { state } from './state.js';
 import { getAllElements } from './utils.js';
 import { renderCanvas } from './canvasRenderer.js';
+import { pushHistory } from './history.js';
 
 // z-index 초기화 (기존 요소들에 z-index가 없는 경우)
 export function initializeZIndexes() {
@@ -36,6 +37,7 @@ export function bringToFront(element, elementType) {
   const maxZIndex = Math.max(...allElements.map(item => item.element.zIndex || 0));
   element.zIndex = maxZIndex + 1;
   renderCanvas();
+  pushHistory();
 }
 
 // 앞으로 이동
@@ -49,6 +51,7 @@ export function bringForward(element, elementType) {
     element.zIndex = nextElement.element.zIndex;
     nextElement.element.zIndex = tempZIndex;
     renderCanvas();
+    pushHistory();
   }
 }
 
@@ -63,6 +66,7 @@ export function sendBackward(element, elementType) {
     element.zIndex = prevElement.element.zIndex;
     prevElement.element.zIndex = tempZIndex;
     renderCanvas();
+    pushHistory();
   }
 }
 
@@ -72,6 +76,7 @@ export function sendToBack(element, elementType) {
   const minZIndex = Math.min(...allElements.map(item => item.element.zIndex || 0));
   element.zIndex = minZIndex - 1;
   renderCanvas();
+  pushHistory();
 }
 
 // 레이어 순서 조정 버튼 이벤트 리스너 초기화

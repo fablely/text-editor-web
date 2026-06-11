@@ -16,15 +16,14 @@
   <!-- Open Graph 메타 태그 추가 -->
   <meta property="og:title" content="페이블리의 사진에 텍스트 추가 - 사진에 글씨 넣기 무료 웹에디터">
   <meta property="og:description" content="사진에 글씨를 쉽게 추가하고 다운로드할 수 있는 무료 웹툴입니다. 사진에 텍스트 삽입, 이미지에 글자쓰기 기능을 지원합니다.">
-  <meta property="og:image" content="https://github.com/fablely/text-editor-web/blob/main/Img/MainImg.jpg?raw=true">
-  <meta property="og:url" content="https://github.com/fablely/text-editor-web/blob/main/Img/MainImg.jpg?raw=true">
+  <meta property="og:image" content="https://fablely.github.io/text-on-image/Img/MainImg.jpg">
+  <meta property="og:url" content="https://fablely.github.io/text-on-image/">
   <meta property="og:type" content="website">
 
   <!-- 카카오톡 전용 메타태그 -->
-  <meta property="al:ios:url" content="https://github.com/fablely/text-editor-web/blob/main/Img/MainImg.jpg?raw=true">
-  <meta property="al:android:url"
-    content="https://github.com/fablely/text-editor-web/blob/main/Img/MainImg.jpg?raw=true">
-  <meta property="al:web:url" content="https://github.com/fablely/text-editor-web/blob/main/Img/MainImg.jpg?raw=true">
+  <meta property="al:ios:url" content="https://fablely.github.io/text-on-image/">
+  <meta property="al:android:url" content="https://fablely.github.io/text-on-image/">
+  <meta property="al:web:url" content="https://fablely.github.io/text-on-image/">
   <meta property="al:ios:app_name" content="페이블리의 사진에 텍스트 추가 - 사진에 글씨 넣기 무료 웹에디터">
   <meta property="al:android:app_name" content="페이블리의 사진에 텍스트 추가 - 사진에 글씨 넣기 무료 웹에디터">
   <meta property="al:web:should_fallback" content="true">
@@ -33,7 +32,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="페이블리의 사진에 텍스트 추가 - 사진에 글씨 넣기 무료 웹에디터">
   <meta name="twitter:description" content="사진에 글씨를 쉽게 추가하고 다운로드할 수 있는 무료 웹툴입니다. 사진에 텍스트 삽입, 이미지에 글자쓰기 기능을 지원합니다.">
-  <meta name="twitter:image" content="https://github.com/fablely/text-editor-web/blob/main/Img/MainImg.jpg?raw=true">
+  <meta name="twitter:image" content="https://fablely.github.io/text-on-image/Img/MainImg.jpg">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -144,8 +143,14 @@
 
   <div class="editor-container">
     <header class="app-header">
-      <h1 class="app-title">Fablely <span class="title-mark">✿</span></h1>
-      <p class="app-subtitle">사진을 예쁘게 꾸며요</p>
+      <div class="app-header-text">
+        <h1 class="app-title">Fablely <span class="title-mark">✿</span></h1>
+        <p class="app-subtitle">사진을 예쁘게 꾸며요</p>
+      </div>
+      <div class="header-actions">
+        <button id="undoBtn" type="button" class="hist-btn" aria-label="실행취소" title="실행취소 (Ctrl+Z)" disabled>↶</button>
+        <button id="redoBtn" type="button" class="hist-btn" aria-label="다시실행" title="다시실행 (Ctrl+Shift+Z)" disabled>↷</button>
+      </div>
     </header>
 
     <label class="upload-button full-width">
@@ -245,6 +250,20 @@
           <span class="slider-label">회전</span>
           <input type="range" id="modalRotation" min="-180" max="180" value="0" step="1">
           <span id="modalRotationValue" class="slider-value">0°</span>
+        </div>
+      </div>
+
+      <!-- 섹션: 외곽선 / 그림자 -->
+      <div class="modal-section">
+        <div class="slider-row">
+          <span class="slider-label">외곽선</span>
+          <input type="range" id="modalStrokeWidth" min="0" max="20" step="0.5" value="0">
+          <span id="modalStrokeWidthValue" class="slider-value">0</span>
+        </div>
+        <div class="control-row">
+          <span class="slider-label">선 색상</span>
+          <input type="color" id="modalStrokeColor" value="#000000" class="color-swatch">
+          <button id="modalShadowBtn" type="button" class="pill-button">그림자</button>
         </div>
       </div>
 

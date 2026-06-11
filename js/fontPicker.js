@@ -3,6 +3,7 @@ import { state } from './state.js';
 import { renderCanvas } from './canvasRenderer.js';
 import { updateModalControls } from './canvasRenderer.js';
 import { ensureFontLoaded } from './fontLoader.js';
+import { pushHistory } from './history.js';
 import { log } from './logger.js';
 
 // 전역 변수 선언을 최적화
@@ -313,7 +314,10 @@ function applyFontSelection() {
     document.getElementById('modalFontDisplay').style.fontFamily = value;
 
     // 폰트 보장 로드 후 캔버스 반영
-    ensureFontLoaded(value).then(() => renderCanvas());
+    ensureFontLoaded(value).then(() => {
+      renderCanvas();
+      pushHistory();
+    });
     updateModalControls(state.selectedText);
   }
 

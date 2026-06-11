@@ -2,6 +2,7 @@
 import { state } from './state.js';
 import { getNextZIndex, isMobile } from './utils.js';
 import { renderCanvas, positionModalNearText, updateModalControls } from './canvasRenderer.js';
+import { pushHistory } from './history.js';
 import { log, warn } from './logger.js';
 
 // 모바일 전용 포커스 함수
@@ -124,6 +125,9 @@ export function initTextControls() {
       rotation: 0, // 기본 회전
       direction: 'horizontal', // 기본 방향
       letterSpacing: 0, // 기본 자간
+      strokeWidth: 0, // 외곽선 두께(0=없음)
+      strokeColor: '#000000', // 외곽선 색
+      shadow: false, // 그림자
       zIndex: getNextZIndex() // 새로운 z-index 할당
     };
     
@@ -140,6 +144,7 @@ export function initTextControls() {
     }
 
     renderCanvas();
+    pushHistory();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // 추가된 텍스트에 바로 포커스 및 선택 상태로 만들기

@@ -1,6 +1,6 @@
 // js/canvasRenderer.js
 import { state } from './state.js';
-import { getAllElements } from './utils.js';
+import { getAllElements, isMobile } from './utils.js';
 
 // 선택된 스티커 모서리 핸들: 화면 표시 크기와, 터치를 고려한 히트 영역(반경)
 const HANDLE_SIZE = 12;
@@ -151,6 +151,36 @@ function renderSticker(sticker) {
   ctx.restore();
 }
 
+// 텍스트 한 조각을 그림자 → 외곽선 → 채움 순서로 그린다.
+// fontSize/strokeWidth는 이미 스케일이 적용된 값을 넘긴다(화면=1배, 저장=비율).
+export function paintText(ctx, str, x, y, opts) {
+  const { fontSize, fillStyle, strokeWidth = 0, strokeColor = '#000000', shadow = false } = opts;
+
+  if (shadow) {
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+    ctx.shadowBlur = Math.max(2, fontSize * 0.12);
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = Math.max(1, fontSize * 0.05);
+  }
+
+  if (strokeWidth > 0) {
+    ctx.lineWidth = strokeWidth;
+    ctx.strokeStyle = strokeColor;
+    ctx.lineJoin = 'round';
+    ctx.miterLimit = 2;
+    ctx.strokeText(str, x, y);
+    ctx.shadowColor = 'transparent'; // 채움에 그림자 중복 방지
+  }
+
+  if (fillStyle) ctx.fillStyle = fillStyle;
+  ctx.fillText(str, x, y);
+
+  // 다음 조각으로 그림자가 새지 않도록 해제
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+}
+
 // 텍스트 렌더링 함수
 function renderText(t) {
   const { ctx } = state;
@@ -164,20 +194,27 @@ function renderText(t) {
   ctx.textBaseline = 'top';
 
   const spacing = t.letterSpacing || 0;
+  const opts = {
+    fontSize: t.size,
+    fillStyle: t.color,
+    strokeWidth: t.strokeWidth || 0,
+    strokeColor: t.strokeColor || '#000000',
+    shadow: !!t.shadow
+  };
 
   if (t.direction === 'vertical') {
     t.text.split('').forEach((ch, i) => {
-      ctx.fillText(ch, 0, i * (t.size + spacing));
+      paintText(ctx, ch, 0, i * (t.size + spacing), opts);
     });
   } else {
     if (spacing) {
       let xPos = 0;
       t.text.split('').forEach(ch => {
-        ctx.fillText(ch, xPos, 0);
+        paintText(ctx, ch, xPos, 0, opts);
         xPos += ctx.measureText(ch).width + spacing;
       });
     } else {
-      ctx.fillText(t.text, 0, 0);
+      paintText(ctx, t.text, 0, 0, opts);
     }
   }
 
@@ -288,6 +325,19 @@ export function resizeCanvas(newWidth, newHeight) {
 }
 
 export function positionModalNearText(textObj) {
+  // 모바일: 편집 모달을 화면 하단 시트로 고정(CSS가 위치 담당).
+  // 따라다님을 끄면 스크롤해도 텍스트를 가리지 않음.
+  if (isMobile()) {
+    const m = document.getElementById('textControlModal');
+    if (m) {
+      m.style.position = '';
+      m.style.left = '';
+      m.style.top = '';
+      m.style.transform = '';
+    }
+    return;
+  }
+
   const canvasRect = state.canvas.getBoundingClientRect();
   const modalWidth = 300;
   const modalHeight = 320; // 카드형 리디자인으로 모달이 길어져 추정값 상향(뷰포트 밖 클리핑 방지)
@@ -390,6 +440,14 @@ export function updateModalControls(textObj) {
   document.getElementById('modalLetterSpacingValue').textContent = textObj.letterSpacing || 0;
   document.getElementById('modalRotation').value = textObj.rotation || 0;
   document.getElementById('modalRotationValue').textContent = `${textObj.rotation || 0}°`;
+
+  // 외곽선 / 그림자 동기화
+  const strokeWidth = textObj.strokeWidth || 0;
+  document.getElementById('modalStrokeWidth').value = strokeWidth;
+  document.getElementById('modalStrokeWidthValue').textContent = strokeWidth;
+  document.getElementById('modalStrokeColor').value = textObj.strokeColor || '#000000';
+  const shadowBtn = document.getElementById('modalShadowBtn');
+  if (shadowBtn) shadowBtn.classList.toggle('active', !!textObj.shadow);
   const direction = textObj.direction || 'horizontal';
   document.getElementById('modalTextDirection').value = direction;
 

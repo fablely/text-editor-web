@@ -9,16 +9,19 @@ import {
   findStickerResizeHandle
 } from './canvasRenderer.js';
 import { stickerControls } from './stickerControls.js';
+import { pushHistory } from './history.js';
 
 export function initDragAndDrop() {
   const canvas = state.canvas;
   let resizeHandle = null;
   let initialStickerSize = null;
   let initialMousePos = null;
+  let didModify = false; // 이번 제스처에서 실제 이동/리사이즈가 있었는지
 
   function handleStart(e) {
     const { x, y } = getEventPos(e);
-    
+    didModify = false;
+
     // 크기 조정 핸들 확인
     resizeHandle = findStickerResizeHandle(x, y);
     if (resizeHandle && state.selectedElement && state.selectedElementType === 'sticker') {
@@ -109,8 +112,9 @@ export function initDragAndDrop() {
     if (state.isResizing && resizeHandle && state.selectedElement) {
       const deltaX = x - initialMousePos.x;
       const deltaY = y - initialMousePos.y;
-      
+
       resizeStickerByHandle(resizeHandle, deltaX, deltaY);
+      didModify = true;
       renderCanvas();
       e.preventDefault();
       return;
@@ -118,8 +122,12 @@ export function initDragAndDrop() {
     
     // 드래그 모드
     if (state.isDragging && state.selectedElement) {
-      state.selectedElement.x = x - state.dragOffset.x;
-      state.selectedElement.y = y - state.dragOffset.y;
+      // 캔버스 밖으로 완전히 빠져 잃어버리지 않도록 앵커 좌표를 캔버스 안으로 클램프
+      const cw = state.canvasWidth || (state.canvas.width / state.canvasScale);
+      const ch = state.canvasHeight || (state.canvas.height / state.canvasScale);
+      state.selectedElement.x = Math.max(0, Math.min(x - state.dragOffset.x, cw));
+      state.selectedElement.y = Math.max(0, Math.min(y - state.dragOffset.y, ch));
+      didModify = true;
       
       // 드래그 중에는 모달이 텍스트/스티커를 따라다님
       if (state.selectedElementType === 'text') {
@@ -161,6 +169,12 @@ export function initDragAndDrop() {
     initialStickerSize = null;
     initialMousePos = null;
     canvas.style.cursor = 'default';
+
+    // 실제로 이동/리사이즈가 있었으면 히스토리 적재
+    if (didModify) {
+      didModify = false;
+      pushHistory();
+    }
   }
 
   function resizeStickerByHandle(handle, deltaX, deltaY) {
