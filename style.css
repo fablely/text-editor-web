@@ -1118,7 +1118,8 @@ select:disabled, input:disabled {
     0 -8px 32px rgba(103, 126, 234, 0.15),
     0 -4px 16px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  z-index: 1100;
+  /* 텍스트 편집 모달(모바일 하단시트 z-index:1200)보다 위에 떠야 함 */
+  z-index: 1300;
   transform: translateY(100%);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: none;
